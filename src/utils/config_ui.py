@@ -504,8 +504,8 @@ class ConfigUI:
         ]
 
         # Others settings
-        self.config["OTHERS"]["SKIP_SSL_VERIFICATION"] = self.skip_ssl.get()
-        self.config["OTHERS"]["USE_PROXY_FOR_RPC"] = self.use_proxy.get()
+        self.config["OTHERS"]["SKIP_SSL_VERIFICATION"] = bool(self.skip_ssl.get())
+        self.config["OTHERS"]["USE_PROXY_FOR_RPC"] = bool(self.use_proxy.get())
 
         # Save to file with improved formatting
         config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config.yaml")

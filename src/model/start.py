@@ -210,7 +210,7 @@ class Start:
                 self.config,
                 self.wallet,
             )
-        
+
     async def sleep(self, task_name: str):
         """Делает рандомную паузу между действиями"""
         pause = random.randint(
