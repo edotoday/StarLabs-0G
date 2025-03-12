@@ -201,7 +201,9 @@ async def faucet_tokens(
 
         balance = await web3.get_balance(wallet.address)
         if balance.ether < 0.00000001:
-            logger.error(f"{account_index} | Insufficient A0GI balance. Start 'faucet' task first.")
+            logger.error(
+                f"{account_index} | Insufficient A0GI balance. Start 'faucet' task first."
+            )
             return False
 
         for token_name in FAUCET_CONTRACTS.keys():
@@ -233,13 +235,13 @@ async def faucet_tokens(
                 f"{account_index} | Successfully minted {success_minted} tokens"
             )
             return True
-        
+
         else:
             logger.error(
                 f"{account_index} | Failed to mint 2 tokens. Sleeping {random_pause} seconds..."
             )
             return False
-    
+
     except Exception as e:
         random_pause = random.randint(
             config.SETTINGS.PAUSE_BETWEEN_ATTEMPTS[0],

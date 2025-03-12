@@ -1,6 +1,7 @@
 import asyncio
 import random
 import time
+from typing import Optional
 
 from loguru import logger
 from src.utils.decorators import retry_async
@@ -325,9 +326,12 @@ async def swap_tokens(
         )
 
         logger.info(
-            f"{account_index} | Swap transaction sent, waiting for confirmation..."
+            f"{account_index} | Swap transaction sent, waiting for confirmation (timeout: {config.SETTINGS.WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS}s)..."
         )
-        receipt = await web3.web3.eth.wait_for_transaction_receipt(tx_hash)
+        receipt = await web3.web3.eth.wait_for_transaction_receipt(
+            tx_hash,
+            timeout=config.SETTINGS.WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS,
+        )
 
         if receipt["status"] == 1:
             logger.success(

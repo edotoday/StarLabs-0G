@@ -45,6 +45,8 @@ SETTINGS:
     # telegram users ids
     TELEGRAM_USERS_IDS: [235123432]
 
+    # wait for transaction confirmation in seconds
+    WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS: 120
 
 FLOW:
     # if task from database failed, bot will skip it

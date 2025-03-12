@@ -20,6 +20,7 @@ class SettingsConfig:
     TELEGRAM_BOT_TOKEN: str
     SEND_TELEGRAM_LOGS: bool
     SHUFFLE_WALLETS: bool
+    WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS: int
 
 
 @dataclass
@@ -120,6 +121,9 @@ class Config:
                 TELEGRAM_BOT_TOKEN=data["SETTINGS"]["TELEGRAM_BOT_TOKEN"],
                 SEND_TELEGRAM_LOGS=data["SETTINGS"]["SEND_TELEGRAM_LOGS"],
                 SHUFFLE_WALLETS=data["SETTINGS"].get("SHUFFLE_WALLETS", True),
+                WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS=data["SETTINGS"].get(
+                    "WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS", 120
+                ),
             ),
             FLOW=FlowConfig(
                 TASKS=tasks_list,
