@@ -188,7 +188,7 @@ async def account_flow(
 
         result = await wrapper(instance.initialize, config)
         if not result:
-            report = True
+            raise Exception("Failed to initialize")
 
         result = await wrapper(instance.flow, config)
         if not result:
