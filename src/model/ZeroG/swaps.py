@@ -221,7 +221,7 @@ async def swaps(
         return False
 
 
-@retry_async(attempts=3, delay=5.0, backoff=2.0, default_value=False)
+@retry_async(delay=5.0, backoff=2.0, default_value=False)
 async def swap_tokens(
     account_index: int,
     session: primp.AsyncClient,

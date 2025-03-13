@@ -110,7 +110,7 @@ async def conft_app(
         raise
 
 
-@retry_async(attempts=5, default_value=False)
+@retry_async(default_value=False)
 async def mint_nft(
     account_index: int,
     session: primp.AsyncClient,
@@ -189,7 +189,7 @@ async def mint_nft(
 DOMAIN_CONTRACT_ADDRESS = "0xCF7f37B4916AC5c530C863f8c8bB26Ec1e8d2Ccb"
 
 
-@retry_async(attempts=5, default_value=False)
+@retry_async(default_value=False)
 async def mint_domain(
     account_index: int,
     session: primp.AsyncClient,

@@ -18,7 +18,7 @@ STORAGE_SCAN_CONTRACT = "0x0460aA47b41a66694c0a73f667a1b795A5ED3556"
 CHAIN_ID = 16600
 
 
-@retry_async(attempts=5, default_value=False)
+@retry_async(default_value=False)
 async def deploy_storage_scan(
     account_index: int,
     session: primp.AsyncClient,

@@ -31,7 +31,7 @@ MINT_ABI = [
 ]
 
 
-@retry_async(attempts=5, default_value=False)
+@retry_async(default_value=False)
 async def faucet(
     account_index: int,
     session: primp.AsyncClient,
@@ -117,7 +117,7 @@ async def faucet(
         raise
 
 
-@retry_async(attempts=5, default_value=False)
+@retry_async(default_value=False)
 async def mint_token(
     account_index: int,
     web3: Web3Custom,
