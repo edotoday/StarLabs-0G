@@ -1,7 +1,22 @@
-TASKS = ["STORAGESCAN_DEPLOY", "CONFT_APP", "SWAPS"]
+TASKS = ["FAUCET"]
 
-SWAPS = ["swaps"]
+
+FULL_TASK = [
+    "FAUCET",
+    "FAUCET_TOKENS",
+    "SWAPS",
+    "STORAGESCAN_DEPLOY",
+    "CONFT_APP",
+]
+
+ONLY_SWAPS = [
+    "STORAGESCAN_DEPLOY",
+    "CONFT_APP",
+    "SWAPS",
+]
+
 FAUCET = ["faucet"]
+SWAPS = ["swaps"]
 FAUCET_TOKENS = ["faucet_tokens"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
 CONFT_APP = ["conft_mint"]
@@ -40,10 +55,10 @@ TASKS = [
     "CREATE_YOUR_OWN_TASK",
 ]
 CREATE_YOUR_OWN_TASK = [
-    "logs",
-    ("bridge", "swaps"),
-    ["lend", "borrow"],
-    "stake",
+    "faucet",
+    ("faucet_tokens", "swaps"),
+    ["storagescan_deploy", "conft_mint"],
+    "swaps",
 ]
 --------------------------------
 
@@ -51,4 +66,11 @@ CREATE_YOUR_OWN_TASK = [
 BELOW ARE THE READY-MADE TASKS THAT YOU CAN USE:
 СНИЗУ ПРИВЕДЕНЫ ГОТОВЫЕ ПРИМЕРЫ ЗАДАЧ, КОТОРЫЕ ВЫ МОЖЕТЕ ИСПОЛЬЗОВАТЬ:
 以下是您可以使用的现成任务：
+
+
+faucet - faucet A0GI tokens (needs captcha)
+faucet_tokens - faucet ETH/BTC/USDT tokens (needs A0GI balance)
+swaps - swaps tokens randomly on 0g hub
+storagescan_deploy - deploy storagescan file
+conft_mint - mint conftApp nft (once per wallet) and mint Domain
 """
