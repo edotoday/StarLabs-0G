@@ -110,6 +110,11 @@ async def faucet(
             config.SETTINGS.PAUSE_BETWEEN_ATTEMPTS[0],
             config.SETTINGS.PAUSE_BETWEEN_ATTEMPTS[1],
         )
+        if "hours before requesting again" in str(e):
+            logger.success(
+                f"{account_index} | Faucet already requested today. Wait some time before requesting again."
+            )
+            return True
         logger.error(
             f"{account_index} | Faucet error: {e}. Sleeping {random_pause} seconds..."
         )
