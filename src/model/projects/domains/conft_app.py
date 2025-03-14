@@ -198,47 +198,7 @@ async def mint_domain(
     wallet: Account,
 ):
     try:
-        domain_for_mint = None
-        for _ in range(10):
-            domain = generate_username()
-            headers = {
-                "accept": "*/*",
-                "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,ru;q=0.7,zh-TW;q=0.6,zh;q=0.5",
-                "priority": "u=1, i",
-                "referer": f"https://conft.app/name-service?name={domain}&blockchain=oglabs_testnet&blockchainId=16600",
-                "sec-ch-ua": '"Not(A:Brand";v="99", "Google Chrome";v="133", "Chromium";v="133"',
-                "sec-ch-ua-mobile": "?0",
-                "sec-ch-ua-platform": '"Windows"',
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-origin",
-                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
-            }
-
-            params = {
-                "name": domain,
-                "blockchain": "oglabs_testnet",
-                "blockchainId": "16600",
-                "_data": "routes/name-service",
-            }
-
-            response = await session.get(
-                "https://conft.app/name-service", params=params, headers=headers
-            )
-
-            if response.status_code != 200:
-                raise Exception(f"Failed to get domain info: {response.status_code}")
-
-            is_available = response.json()["selectedBlockchainFromCookie"][
-                "isDomainsAvailable"
-            ]
-            if is_available:
-                domain_for_mint = domain
-                logger.success(f"{account_index} | Domain {domain} is available")
-                break
-
-        if domain_for_mint is None:
-            raise Exception("No available domain found")
+        domain_for_mint = generate_username()
 
         # Encode domain name as bytes
         domain_bytes = domain_for_mint.encode().hex()
