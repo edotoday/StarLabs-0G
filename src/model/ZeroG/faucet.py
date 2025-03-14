@@ -212,39 +212,44 @@ async def faucet_tokens(
             return False
 
         for token_name in FAUCET_CONTRACTS.keys():
-            success = await mint_token(
-                account_index,
-                web3,
-                wallet,
-                token_name,
-                FAUCET_CONTRACTS[token_name],
-                config,
-            )
-            if not success:
-                logger.error(f"{account_index} | Failed to mint {token_name}")
-            else:
-                success_minted += 1
+            try:
+                success = await mint_token(
+                    account_index,
+                    web3,
+                    wallet,
+                    token_name,
+                    FAUCET_CONTRACTS[token_name],
+                    config,
+                )
+                if success:
+                    success_minted += 1
+                    logger.success(
+                        f"{account_index} | Successfully minted {token_name}"
+                    )
+                else:
+                    logger.error(f"{account_index} | Failed to mint {token_name}")
+            except Exception as e:
+                # Продолжаем с другими токенами даже если этот не удался
+                logger.error(f"{account_index} | Error minting {token_name}: {str(e)}")
+                continue
+            finally:
+                # Add delay between mints regardless of success
+                random_pause = random.randint(
+                    config.SETTINGS.PAUSE_BETWEEN_SWAPS[0],
+                    config.SETTINGS.PAUSE_BETWEEN_SWAPS[1],
+                )
+                logger.info(
+                    f"{account_index} | Sleeping {random_pause} seconds after attempting {token_name}..."
+                )
+                await asyncio.sleep(random_pause)
 
-            # Add delay between mints
-            random_pause = random.randint(
-                config.SETTINGS.PAUSE_BETWEEN_SWAPS[0],
-                config.SETTINGS.PAUSE_BETWEEN_SWAPS[1],
-            )
-            logger.info(
-                f"{account_index} | Sleeping {random_pause} seconds after minting {token_name}..."
-            )
-            await asyncio.sleep(random_pause)
-
-        if success_minted >= 2:
+        if success_minted >= 1:
             logger.success(
-                f"{account_index} | Successfully minted {success_minted} tokens"
+                f"{account_index} | Successfully minted {success_minted} out of {len(FAUCET_CONTRACTS)} tokens"
             )
             return True
-
         else:
-            logger.error(
-                f"{account_index} | Failed to mint 2 tokens. Sleeping {random_pause} seconds..."
-            )
+            logger.error(f"{account_index} | Failed to mint any tokens.")
             return False
 
     except Exception as e:
