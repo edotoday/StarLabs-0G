@@ -62,7 +62,27 @@ class Start:
                 pass
 
             db = Database()
-            tasks = await db.get_wallet_pending_tasks(self.private_key)
+            try:
+                tasks = await db.get_wallet_pending_tasks(self.private_key)
+            except Exception as e:
+                if "no such table: wallets" in str(e):
+                    logger.error(
+                        f"{self.account_index} | Database not created or wallets table not found"
+                    )
+                    if self.config.SETTINGS.SEND_TELEGRAM_LOGS:
+                        error_message = (
+                            f"⚠️ Database error\n\n"
+                            f"Account #{self.account_index}\n"
+                            f"Wallet: <code>{self.private_key[:6]}...{self.private_key[-4:]}</code>\n"
+                            f"Error: Database not created or wallets table not found"
+                        )
+                        await send_telegram_message(self.config, error_message)
+                    return False
+                else:
+                    logger.error(
+                        f"{self.account_index} | Error getting tasks from database: {e}"
+                    )
+                    raise
 
             if not tasks:
                 logger.warning(
