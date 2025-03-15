@@ -1,12 +1,19 @@
 from tabulate import tabulate
 from loguru import logger
+import pandas as pd
+from datetime import datetime
+import os
 
 from src.utils.config import Config, WalletInfo
 
 
-def print_wallets_stats(config: Config):
+def print_wallets_stats(config: Config, excel_path="data/progress.xlsx"):
     """
-    Выводит статистику по всем кошелькам в виде таблицы
+    Выводит статистику по всем кошелькам в виде таблицы и сохраняет в Excel файл
+
+    Args:
+        config: Конфигурация с данными кошельков
+        excel_path: Путь для сохранения Excel файла (по умолчанию "data/progress.xlsx")
     """
     try:
         # Сортируем кошельки по индексу
@@ -72,6 +79,44 @@ def print_wallets_stats(config: Config):
             logger.info(f"Average transactions: {avg_transactions:.1f}")
             logger.info(f"Total balance: {total_balance:.4f} ETH")
             logger.info(f"Total transactions: {total_transactions:,}")
+
+            # Экспорт в Excel
+            # Создаем DataFrame для Excel
+            df = pd.DataFrame(table_data, columns=headers)
+
+            # Добавляем итоговую статистику
+            summary_data = [
+                ["", "", "", "", ""],
+                ["SUMMARY", "", "", "", ""],
+                [
+                    "Total",
+                    f"{wallets_count} wallets",
+                    "",
+                    f"{total_balance:.4f} ETH",
+                    f"{total_transactions:,}",
+                ],
+                [
+                    "Average",
+                    "",
+                    "",
+                    f"{avg_balance:.4f} ETH",
+                    f"{avg_transactions:.1f}",
+                ],
+            ]
+            summary_df = pd.DataFrame(summary_data, columns=headers)
+            df = pd.concat([df, summary_df], ignore_index=True)
+
+            # Создаем директорию, если она не существует
+            os.makedirs(os.path.dirname(excel_path), exist_ok=True)
+
+            # Формируем имя файла с датой и временем
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"progress_{timestamp}.xlsx"
+            file_path = os.path.join(os.path.dirname(excel_path), filename)
+
+            # Сохраняем в Excel
+            df.to_excel(file_path, index=False)
+            logger.info(f"Statistics exported to {file_path}")
         else:
             logger.info("\nNo wallet statistics available")
 
