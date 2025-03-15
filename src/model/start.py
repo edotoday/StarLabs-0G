@@ -4,6 +4,7 @@ import primp
 import random
 import asyncio
 
+from src.model.projects.mints import mintaura_panda, mint_nerzo_0gog
 from src.model.projects.domains import conft_app
 from src.model.help.stats import WalletStats
 from src.model.ZeroG import faucet, faucet_tokens, deploy_storage_scan, swaps
@@ -224,6 +225,24 @@ class Start:
 
         if task == "swaps":
             return await swaps(
+                self.account_index,
+                self.session,
+                self.zerog_web3,
+                self.config,
+                self.wallet,
+            )
+
+        if task == "mint_aura":
+            return await mintaura_panda(
+                self.account_index,
+                self.session,
+                self.zerog_web3,
+                self.config,
+                self.wallet,
+            )
+
+        if task == "mint_panda_0g":
+            return await mint_nerzo_0gog(
                 self.account_index,
                 self.session,
                 self.zerog_web3,

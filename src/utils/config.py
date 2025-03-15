@@ -42,7 +42,6 @@ class CaptchaConfig:
 
 @dataclass
 class RpcsConfig:
-    ARBITRUM: List[str]
     ZEROG: List[str]
 
 
@@ -139,7 +138,6 @@ class Config:
                 NOCAPTCHA_API_KEY=data["CAPTCHA"]["NOCAPTCHA_API_KEY"],
             ),
             RPCS=RpcsConfig(
-                ARBITRUM=data["RPCS"]["ARBITRUM"],
                 ZEROG=data["RPCS"]["ZEROG"],
             ),
             OTHERS=OthersConfig(

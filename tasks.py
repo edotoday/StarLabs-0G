@@ -1,4 +1,4 @@
-TASKS = ["FAUCET"]
+TASKS = ["EVERY_DAY"]
 
 
 FULL_TASK = [
@@ -15,11 +15,21 @@ ONLY_SWAPS = [
     "SWAPS",
 ]
 
+EVERY_DAY = [
+    "FAUCET",
+    "FAUCET_TOKENS",
+    ["SWAPS", "SKIP"],
+    ("MINT_PANDA_0G", "MINT_NERZO_0GOG", "STORAGESCAN_DEPLOY", "CONFT_APP"),
+    "SWAPS",
+]
+
 FAUCET = ["faucet"]
 SWAPS = ["swaps"]
 FAUCET_TOKENS = ["faucet_tokens"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
 CONFT_APP = ["conft_mint"]
+MINT_AURA = ["mint_aura"]
+MINT_PANDA_0G = ["mint_panda_0g"]
 
 """
 EN:
@@ -73,4 +83,6 @@ faucet_tokens - faucet ETH/BTC/USDT tokens (needs A0GI balance)
 swaps - swaps tokens randomly on 0g hub
 storagescan_deploy - deploy storagescan file
 conft_mint - mint conftApp nft (once per wallet) and mint Domain
+mint_aura - mint aura panda nft (once per wallet) - https://www.mintaura.io/panda
+mint_panda_0g - mint panda 0g nft (once per wallet) - https://nerzo.xyz/0gog
 """

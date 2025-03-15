@@ -380,13 +380,6 @@ class ConfigUI:
         self.create_category_header(self.scrollable_frame, "🌐 RPCS")
         rpcs = self.create_section(self.scrollable_frame, "RPCS")
 
-        self.arbitrum_rpcs = self.create_single_input(
-            rpcs,
-            "ARBITRUM",
-            ", ".join(self.config["RPCS"]["ARBITRUM"]),
-            width=self.input_sizes["extra_large"],
-        )
-
         self.zerog_rpcs = self.create_single_input(
             rpcs,
             "ZEROG",
@@ -496,9 +489,6 @@ class ConfigUI:
         self.config["CAPTCHA"]["NOCAPTCHA_API_KEY"] = self.nocaptcha_api_key.get()
 
         # RPCs settings
-        self.config["RPCS"]["ARBITRUM"] = [
-            x.strip() for x in self.arbitrum_rpcs.get().split(",") if x.strip()
-        ]
         self.config["RPCS"]["ZEROG"] = [
             x.strip() for x in self.zerog_rpcs.get().split(",") if x.strip()
         ]

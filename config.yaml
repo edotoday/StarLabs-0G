@@ -36,7 +36,7 @@ SETTINGS:
     
     # random pause before start of every account
     # to make sure that all accounts will be started at different times
-    RANDOM_INITIALIZATION_PAUSE: [1, 2]
+    RANDOM_INITIALIZATION_PAUSE: [5, 30]
     
     # if true, bot will send logs to telegram
     SEND_TELEGRAM_LOGS: false
@@ -63,14 +63,13 @@ HUB_0G_SWAPS:
 
 
 RPCS:
-    ARBITRUM: [""]
     ZEROG: ["https://16600.rpc.thirdweb.com/"]
 
 
 CAPTCHA:
     # nocaptcha.io/register?c=SWVtru
     # API KEY for faucet
-    NOCAPTCHA_API_KEY: "7fsdfsd-asdf-sdfasdf-asdfasdfasdfasdfc"
+    NOCAPTCHA_API_KEY: "123"
 
 
 OTHERS:
