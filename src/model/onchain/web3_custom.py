@@ -358,16 +358,16 @@ class Web3Custom:
         )
         return False
 
-    @retry_async(attempts=3, delay=5.0, default_value=None)
+    @retry_async(attempts=3, delay=10.0, default_value=None)
     async def estimate_gas(self, transaction: dict) -> int:
         """Estimate gas for transaction and add some buffer."""
         try:
             estimated = await self.web3.eth.estimate_gas(transaction)
             # Добавляем 10% к estimated gas для безопасности
-            return int(estimated * 1.1)
+            return int(estimated * 1.8)
         except Exception as e:
             logger.warning(
-                f"{self.account_index} | Error estimating gas: {e}. Using default gas limit"
+                f"{self.account_index} | Error estimating gas: {e}."
             )
             raise e
 

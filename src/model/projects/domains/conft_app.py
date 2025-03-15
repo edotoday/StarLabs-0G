@@ -187,6 +187,17 @@ async def mint_nft(
 
 # Domain Contract Constants
 DOMAIN_CONTRACT_ADDRESS = "0xCF7f37B4916AC5c530C863f8c8bB26Ec1e8d2Ccb"
+DOMAIN_CONTRACT_ABI = [
+    {
+        "name": "balanceOf",
+        "type": "function",
+        "inputs": [{"name": "owner", "type": "address", "internalType": "address"}],
+        "outputs": [{"name": "", "type": "uint256", "internalType": "uint256"}],
+        "constant": True,
+        "signature": "0x70a08231",
+        "stateMutability": "view",
+    },
+]
 
 
 @retry_async(default_value=False)
@@ -198,6 +209,18 @@ async def mint_domain(
     wallet: Account,
 ):
     try:
+        # Create domain contract instance
+        domain_contract = web3.web3.eth.contract(
+            address=web3.web3.to_checksum_address(DOMAIN_CONTRACT_ADDRESS),
+            abi=DOMAIN_CONTRACT_ABI,
+        )
+
+        # Check if user already has a domain
+        balance = await domain_contract.functions.balanceOf(wallet.address).call()
+        if balance > 0:
+            logger.success(f"{account_index} | Already have Conft.app domain in wallet")
+            return True
+
         domain_for_mint = generate_username()
 
         # Encode domain name as bytes
