@@ -152,11 +152,14 @@ async def swaps(
             token_in_balance = token_balances[token_in_symbol]
             token_in_address = TOKENS[token_in_symbol]["address"]
 
-            # Выбираем токен для получения (любой кроме token_in)
-            available_out_tokens = [
-                symbol for symbol in TOKENS.keys() if symbol != token_in_symbol
-            ]
-            token_out_symbol = random.choice(available_out_tokens)
+            # Выбираем токен для получения (только USDT если входящий ETH или BTC, иначе ETH или BTC)
+            if token_in_symbol == "USDT":
+                available_out_tokens = ["ETH", "BTC"]
+                token_out_symbol = random.choice(available_out_tokens)
+            else:
+                # Если входящий токен ETH или BTC, то выходящий только USDT
+                token_out_symbol = "USDT"
+
             token_out_address = TOKENS[token_out_symbol]["address"]
 
             # Определяем процент баланса для свапа
