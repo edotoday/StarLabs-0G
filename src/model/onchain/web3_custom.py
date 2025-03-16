@@ -364,7 +364,7 @@ class Web3Custom:
         try:
             estimated = await self.web3.eth.estimate_gas(transaction)
             # Добавляем 10% к estimated gas для безопасности
-            return int(estimated * 1.8)
+            return int(estimated * 2.2)
         except Exception as e:
             logger.warning(
                 f"{self.account_index} | Error estimating gas: {e}."
