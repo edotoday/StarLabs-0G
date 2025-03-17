@@ -7,6 +7,7 @@ import threading
 import time
 import logging
 from flask.cli import show_server_banner
+import traceback
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -22,16 +23,36 @@ app = Flask(
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "config.yaml")
 
 
+# Добавьте обработчик ошибок для Flask
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Обрабатывает все необработанные исключения"""
+    # Записываем полный стек-трейс в лог
+    logger.error(f"Unhandled exception: {str(e)}")
+    logger.error(traceback.format_exc())
+    return "Internal Server Error: Check logs for details", 500
+
+
 def load_config():
     """Загрузка конфигурации из YAML файла"""
-    with open(CONFIG_PATH, "r") as file:
-        return yaml.safe_load(file)
+    try:
+        with open(CONFIG_PATH, "r") as file:
+            return yaml.safe_load(file)
+    except Exception as e:
+        logger.error(f"Error loading config: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 
 def save_config(config):
     """Сохранение конфигурации в YAML файл"""
-    with open(CONFIG_PATH, "w") as file:
-        yaml.dump(config, file, default_flow_style=False, sort_keys=False)
+    try:
+        with open(CONFIG_PATH, "w") as file:
+            yaml.dump(config, file, default_flow_style=False, sort_keys=False)
+    except Exception as e:
+        logger.error(f"Error saving config: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 
 @app.route("/")
@@ -68,20 +89,21 @@ def open_browser():
 
 def create_required_directories():
     """Создает необходимые директории для шаблонов и статических файлов"""
-    # Изменяем пути для сохранения файлов
-    base_dir = os.path.join(os.path.dirname(__file__), "config_interface")
-    template_dir = os.path.join(base_dir, "templates")
-    static_dir = os.path.join(base_dir, "static")
-    css_dir = os.path.join(static_dir, "css")
-    js_dir = os.path.join(static_dir, "js")
+    try:
+        # Изменяем пути для сохранения файлов
+        base_dir = os.path.join(os.path.dirname(__file__), "config_interface")
+        template_dir = os.path.join(base_dir, "templates")
+        static_dir = os.path.join(base_dir, "static")
+        css_dir = os.path.join(static_dir, "css")
+        js_dir = os.path.join(static_dir, "js")
 
-    # Создаем все необходимые директории
-    os.makedirs(template_dir, exist_ok=True)
-    os.makedirs(css_dir, exist_ok=True)
-    os.makedirs(js_dir, exist_ok=True)
+        # Создаем все необходимые директории
+        os.makedirs(template_dir, exist_ok=True)
+        os.makedirs(css_dir, exist_ok=True)
+        os.makedirs(js_dir, exist_ok=True)
 
-    # Создаем HTML шаблон
-    html_template = """<!DOCTYPE html>
+        # Создаем HTML шаблон
+        html_template = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -176,8 +198,8 @@ def create_required_directories():
 </html>
 """
 
-    # Создаем CSS файл с улучшенным дизайном
-    css_content = """:root {
+        # Создаем CSS файл с улучшенным дизайном
+        css_content = """:root {
     /* Основные цвета */
     --primary-blue: #3A86FF;      /* Основной синий */
     --secondary-blue: #4361EE;    /* Вторичный синий */
@@ -1007,8 +1029,8 @@ footer::before {
 }
 """
 
-    # Создаем JavaScript файл с улучшенной логикой
-    js_content = """document.addEventListener('DOMContentLoaded', function() {
+        # Создаем JavaScript файл с улучшенной логикой
+        js_content = """document.addEventListener('DOMContentLoaded', function() {
     // Загружаем конфигурацию при загрузке страницы
     fetchConfig();
     
@@ -1446,25 +1468,30 @@ function showNotification(message, type) {
 }
 """
 
-    # Записываем файлы в соответствующие директории
-    template_path = os.path.join(
-        os.path.dirname(__file__), "config_interface", "templates", "config.html"
-    )
-    css_path = os.path.join(
-        os.path.dirname(__file__), "config_interface", "static", "css", "style.css"
-    )
-    js_path = os.path.join(
-        os.path.dirname(__file__), "config_interface", "static", "js", "config.js"
-    )
+        # Записываем файлы в соответствующие директории
+        template_path = os.path.join(
+            os.path.dirname(__file__), "config_interface", "templates", "config.html"
+        )
+        css_path = os.path.join(
+            os.path.dirname(__file__), "config_interface", "static", "css", "style.css"
+        )
+        js_path = os.path.join(
+            os.path.dirname(__file__), "config_interface", "static", "js", "config.js"
+        )
 
-    with open(template_path, "w", encoding="utf-8") as file:
-        file.write(html_template)
+        with open(template_path, "w", encoding="utf-8") as file:
+            file.write(html_template)
 
-    with open(css_path, "w", encoding="utf-8") as file:
-        file.write(css_content)
+        with open(css_path, "w", encoding="utf-8") as file:
+            file.write(css_content)
 
-    with open(js_path, "w", encoding="utf-8") as file:
-        file.write(js_content)
+        with open(js_path, "w", encoding="utf-8") as file:
+            file.write(js_content)
+
+    except Exception as e:
+        logger.error(f"Error creating directories: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 
 def run():
