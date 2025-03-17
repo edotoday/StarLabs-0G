@@ -36,12 +36,21 @@ def handle_exception(e):
 def load_config():
     """Загрузка конфигурации из YAML файла"""
     try:
-        with open(CONFIG_PATH, "r") as file:
-            return yaml.safe_load(file)
+        config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config.yaml")
+        logger.info(f"Loading config from: {config_path}")
+
+        if not os.path.exists(config_path):
+            logger.error(f"Config file not found: {config_path}")
+            return {}
+
+        with open(config_path, "r") as file:
+            config = yaml.safe_load(file)
+            logger.info(f"Config loaded successfully")
+            return config
     except Exception as e:
         logger.error(f"Error loading config: {str(e)}")
         logger.error(traceback.format_exc())
-        raise
+        return {}
 
 
 def save_config(config):
@@ -84,7 +93,7 @@ def update_config():
 def open_browser():
     """Открывает браузер после запуска сервера"""
     time.sleep(2)  # Даем серверу время на запуск
-    webbrowser.open(f"http://127.0.0.1:5000")
+    webbrowser.open(f"http://127.0.0.1:3456")
 
 
 def create_required_directories():
@@ -1494,37 +1503,46 @@ function showNotification(message, type) {
         raise
 
 
+def check_paths():
+    """Проверяет пути к файлам и директориям"""
+    try:
+        base_dir = os.path.dirname(__file__)
+        logger.info(f"Base directory: {base_dir}")
+
+        config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config.yaml")
+        logger.info(f"Config path: {config_path}")
+        logger.info(f"Config exists: {os.path.exists(config_path)}")
+
+        template_dir = os.path.join(base_dir, "config_interface", "templates")
+        logger.info(f"Template directory: {template_dir}")
+        logger.info(f"Template directory exists: {os.path.exists(template_dir)}")
+
+        return True
+    except Exception as e:
+        logger.error(f"Path check failed: {str(e)}")
+        return False
+
+
 def run():
     """Запускает веб-интерфейс для редактирования конфигурации"""
-    import threading
-    import os
-    import sys
-
-    # Создаем необходимые директории и файлы
-    create_required_directories()
-
-    # Запускаем браузер в отдельном потоке
-    threading.Thread(target=open_browser).start()
-
-    # Выводим информацию о запуске с выделением
-    logger.info("Starting web configuration interface...")
-    logger.info("\n" + "=" * 50)
-    logger.info(
-        f"🌐 Configuration interface available at: \033[1;36mhttp://127.0.0.1:5000\033[0m"
-    )
-    logger.info(f"⚠️  To exit and return to main menu: \033[1;33mPress CTRL+C\033[0m")
-    logger.info("=" * 50 + "\n")
-
     try:
-        # Запускаем Flask без логов
-        import logging
+        # Проверяем пути
+        check_paths()
 
-        log = logging.getLogger("werkzeug")
-        log.disabled = True
-        app.logger.disabled = True
+        # Создаем необходимые директории и файлы
+        create_required_directories()
 
-        app.run(debug=False)
-    except KeyboardInterrupt:
-        logger.info("\n" + "=" * 50)
-        logger.info("✅ Web configuration interface stopped")
-        logger.info("=" * 50 + "\n")
+        # Запускаем браузер в отдельном потоке
+        threading.Thread(target=open_browser).start()
+
+        # Выводим информацию о запуске
+        logger.info("Starting web configuration interface...")
+        logger.info(f"Configuration interface available at: http://127.0.0.1:3456")
+        logger.info(f"To exit and return to main menu: Press CTRL+C")
+
+        # Запускаем Flask с отладкой
+        app.run(debug=True, port=3456)
+    except Exception as e:
+        logger.error(f"Failed to start web interface: {str(e)}")
+        logger.error(traceback.format_exc())
+        print(f"ERROR: {str(e)}")
