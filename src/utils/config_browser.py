@@ -97,9 +97,12 @@ def update_config():
     """API для обновления конфигурации"""
     try:
         new_config = request.get_json()
+        logger.info(f"Saving new configuration: {json.dumps(new_config, indent=2)}")
         save_config(new_config)
         return jsonify({"status": "success"})
     except Exception as e:
+        logger.error(f"Error saving config: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
 
@@ -1125,7 +1128,7 @@ async function saveConfig() {
 
 // Функция для сбора данных формы
 function collectFormData() {
-    const config = {};
+    config = {}
     
     // Собираем данные из всех полей ввода
     document.querySelectorAll('[data-config-path]').forEach(element => {
@@ -1140,13 +1143,16 @@ function collectFormData() {
             current = current[path[i]];
         }
         
-        // Устанавливаем значение
         const lastKey = path[path.length - 1];
         
         if (element.type === 'checkbox') {
             current[lastKey] = element.checked;
+        } else if (element.classList.contains('tags-input')) {
+            // Обработка полей с тегами (например, для RPCS)
+            const tags = Array.from(element.querySelectorAll('.tag-text'))
+                .map(tag => tag.textContent.trim());
+            current[lastKey] = tags;
         } else if (element.classList.contains('range-min')) {
-            // Для диапазонов (min-max)
             const rangeKey = lastKey.replace('_MIN', '');
             if (!current[rangeKey]) {
                 current[rangeKey] = [0, 0];
@@ -1243,12 +1249,13 @@ function renderConfig(config) {
                     { key: 'TELEGRAM_USERS_IDS', value: config[key]['TELEGRAM_USERS_IDS'], isSpaceList: true }
                 ], key);
             } else if (key === 'RPCS') {
-                // Создаем карточку для RPCs с поддержкой списков
+                // Специальная обработка для RPCs
                 createCard(cardsContainer, 'RPC Settings', 'network-wired', 
                     Object.entries(config[key]).map(([k, v]) => ({ 
                         key: k, 
                         value: v, 
-                        isList: true 
+                        isList: true,
+                        isArray: true  // Добавляем флаг для массивов
                     })), 
                     key
                 );
@@ -1429,9 +1436,12 @@ function createTagsField(container, key, value, path, useSpaces) {
     tagsContainer.dataset.configPath = path;
     tagsContainer.dataset.useSpaces = useSpaces ? 'true' : 'false';
     
+    // Убедимся, что value является массивом
+    const values = Array.isArray(value) ? value : [value];
+    
     // Добавляем существующие теги
-    value.forEach(item => {
-        const tag = createTag(item);
+    values.forEach(item => {
+        const tag = createTag(item.toString());
         tagsContainer.appendChild(tag);
     });
     
