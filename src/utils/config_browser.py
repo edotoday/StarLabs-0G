@@ -96,13 +96,11 @@ def get_config():
 def update_config():
     """API для обновления конфигурации"""
     try:
-        new_config = request.json
+        new_config = request.get_json()
         save_config(new_config)
-        return jsonify(
-            {"status": "success", "message": "Configuration saved successfully"}
-        )
+        return jsonify({"status": "success"})
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 def open_browser():
@@ -1544,9 +1542,6 @@ def check_paths():
 def run():
     """Запускает веб-интерфейс для редактирования конфигурации"""
     try:
-        # Проверяем пути
-        check_paths()
-
         # Создаем необходимые директории и файлы
         create_required_directories()
 
@@ -1558,8 +1553,13 @@ def run():
         logger.info(f"Configuration interface available at: http://127.0.0.1:3456")
         logger.info(f"To exit and return to main menu: Press CTRL+C")
 
-        # Запускаем Flask с отладкой
-        app.run(debug=True, port=3456, use_reloader=False)
+        # Отключаем логи Werkzeug
+        log = logging.getLogger("werkzeug")
+        log.disabled = True
+        app.logger.disabled = True
+
+        # Запускаем Flask
+        app.run(debug=False, port=3456)
     except KeyboardInterrupt:
         logger.info("Web configuration interface stopped")
     except Exception as e:
