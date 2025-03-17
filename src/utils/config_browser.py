@@ -15,8 +15,10 @@ logger = logging.getLogger(__name__)
 
 app = Flask(
     __name__,
-    static_folder=os.path.join(os.path.dirname(__file__), "interface", "static"),
-    template_folder=os.path.join(os.path.dirname(__file__), "interface", "templates"),
+    static_folder=os.path.join(os.path.dirname(__file__), "config_interface", "static"),
+    template_folder=os.path.join(
+        os.path.dirname(__file__), "config_interface", "templates"
+    ),
 )
 
 # Путь к файлу конфигурации
@@ -67,7 +69,20 @@ def save_config(config):
 @app.route("/")
 def index():
     """Главная страница с интерфейсом конфигурации"""
-    return render_template("config.html")
+    try:
+        # Проверяем наличие шаблона перед рендерингом
+        template_path = os.path.join(
+            os.path.dirname(__file__), "config_interface", "templates", "config.html"
+        )
+        if not os.path.exists(template_path):
+            logger.error(f"Template not found: {template_path}")
+            return "Template not found. Please check logs for details."
+
+        return render_template("config.html")
+    except Exception as e:
+        logger.error(f"Error rendering template: {str(e)}")
+        logger.error(traceback.format_exc())
+        return f"Error: {str(e)}"
 
 
 @app.route("/api/config", methods=["GET"])
@@ -93,7 +108,11 @@ def update_config():
 def open_browser():
     """Открывает браузер после запуска сервера"""
     time.sleep(2)  # Даем серверу время на запуск
-    webbrowser.open(f"http://127.0.0.1:3456")
+    try:
+        webbrowser.open(f"http://127.0.0.1:3456")
+        logger.info("Browser opened successfully")
+    except Exception as e:
+        logger.error(f"Failed to open browser: {str(e)}")
 
 
 def create_required_directories():
@@ -1478,15 +1497,9 @@ function showNotification(message, type) {
 """
 
         # Записываем файлы в соответствующие директории
-        template_path = os.path.join(
-            os.path.dirname(__file__), "config_interface", "templates", "config.html"
-        )
-        css_path = os.path.join(
-            os.path.dirname(__file__), "config_interface", "static", "css", "style.css"
-        )
-        js_path = os.path.join(
-            os.path.dirname(__file__), "config_interface", "static", "js", "config.js"
-        )
+        template_path = os.path.join(template_dir, "config.html")
+        css_path = os.path.join(css_dir, "style.css")
+        js_path = os.path.join(js_dir, "config.js")
 
         with open(template_path, "w", encoding="utf-8") as file:
             file.write(html_template)
@@ -1496,6 +1509,11 @@ function showNotification(message, type) {
 
         with open(js_path, "w", encoding="utf-8") as file:
             file.write(js_content)
+
+        # Проверяем, что файлы созданы
+        logger.info(f"Template file created: {os.path.exists(template_path)}")
+        logger.info(f"CSS file created: {os.path.exists(css_path)}")
+        logger.info(f"JS file created: {os.path.exists(js_path)}")
 
     except Exception as e:
         logger.error(f"Error creating directories: {str(e)}")
@@ -1541,7 +1559,9 @@ def run():
         logger.info(f"To exit and return to main menu: Press CTRL+C")
 
         # Запускаем Flask с отладкой
-        app.run(debug=True, port=3456)
+        app.run(debug=True, port=3456, use_reloader=False)
+    except KeyboardInterrupt:
+        logger.info("Web configuration interface stopped")
     except Exception as e:
         logger.error(f"Failed to start web interface: {str(e)}")
         logger.error(traceback.format_exc())
