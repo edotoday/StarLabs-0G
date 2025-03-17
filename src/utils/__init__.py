@@ -4,8 +4,8 @@ from .output import show_dev_info, show_logo
 from .config import get_config
 from .constants import EXPLORER_URL_0G
 from .statistics import print_wallets_stats
-from .config_ui import ConfigUI
 from .proxy_parser import Proxy
+from .config_browser import run
 
 __all__ = [
     "create_client",
@@ -17,8 +17,8 @@ __all__ = [
     "read_private_keys",
     "show_dev_info",
     "show_logo",
-    "ConfigUI",
     "Proxy",
+    "run",
     "get_config",
     "EXPLORER_URL_0G",
 ]

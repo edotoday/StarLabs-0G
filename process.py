@@ -10,7 +10,7 @@ import src.model
 from src.utils.statistics import print_wallets_stats
 from src.utils.check_github_version import check_version
 from src.utils.logs import ProgressTracker, create_progress_tracker
-
+from src.utils.config_browser import run
 
 async def start():
     async def launch_wrapper(index, proxy, private_key):
@@ -49,8 +49,7 @@ async def start():
     if choice == "4" or not choice:
         return
     elif choice == "2":
-        config_ui = src.utils.ConfigUI()
-        config_ui.run()
+        run()
         return
     elif choice == "1":
         pass
@@ -167,6 +166,7 @@ async def start():
     print_wallets_stats(config)
 
     input("Press Enter to continue...")
+
 
 async def account_flow(
     account_index: int,
