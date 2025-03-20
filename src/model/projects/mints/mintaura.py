@@ -47,13 +47,13 @@ async def mintaura_panda(
             address=web3.web3.to_checksum_address(PANDA_0G_CONTRACT), abi=NFT_ABI
         )
 
-        nft_balance = await nft_contract.functions.balanceOf(wallet.address).call()
+        # nft_balance = await nft_contract.functions.balanceOf(wallet.address).call()
 
-        if nft_balance > 0:
-            logger.success(
-                f"{account_index} | Wallet already has {nft_balance} Panda 0G NFT"
-            )
-            return True
+        # if nft_balance > 0:
+        #     logger.success(
+        #         f"{account_index} | Wallet already has {nft_balance} Panda 0G NFT"
+        #     )
+        #     return True
 
         # Проверяем баланс нативной монеты
         balance = await web3.get_balance(wallet.address)

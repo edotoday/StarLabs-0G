@@ -1,12 +1,14 @@
 TASKS = ["EVERY_DAY"]
 
-
 FULL_TASK = [
     "FAUCET",
     "FAUCET_TOKENS",
     "SWAPS",
     "STORAGESCAN_DEPLOY",
     "CONFT_APP",
+    "MINTAIR_DEPLOY",
+    "MINT_PANDA_0G",
+    "MINT_NERZO_0GOG",
 ]
 
 ONLY_SWAPS = [
@@ -19,7 +21,13 @@ EVERY_DAY = [
     "FAUCET",
     "FAUCET_TOKENS",
     ["SWAPS", "SKIP"],
-    ("MINT_PANDA_0G", "MINT_NERZO_0GOG", "STORAGESCAN_DEPLOY", "CONFT_APP"),
+    (
+        "MINT_PANDA_0G",
+        "MINT_NERZO_0GOG",
+        "STORAGESCAN_DEPLOY",
+        "CONFT_APP",
+        "MINTAIR_DEPLOY",
+    ),
     "SWAPS",
 ]
 
@@ -30,7 +38,7 @@ STORAGESCAN_DEPLOY = ["storagescan_deploy"]
 CONFT_APP = ["conft_mint"]
 MINT_AURA = ["mint_aura"]
 MINT_PANDA_0G = ["mint_panda_0g"]
-
+MINTAIR_DEPLOY = ["mintair_deploy"]
 """
 EN:
 You can create your own task with the modules you need 
@@ -85,4 +93,5 @@ storagescan_deploy - deploy storagescan file
 conft_mint - mint conftApp nft (once per wallet) and mint Domain
 mint_aura - mint aura panda nft (once per wallet) - https://www.mintaura.io/panda
 mint_panda_0g - mint panda 0g nft (once per wallet) - https://nerzo.xyz/0gog
+mintair_deploy - deploy contract at https://contracts.mintair.xyz/
 """

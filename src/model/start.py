@@ -4,6 +4,7 @@ import primp
 import random
 import asyncio
 
+from src.model.projects.deploy import mintair_deploy
 from src.model.projects.mints import mintaura_panda, mint_nerzo_0gog
 from src.model.projects.domains import conft_app
 from src.model.help.stats import WalletStats
@@ -249,6 +250,18 @@ class Start:
                 self.config,
                 self.wallet,
             )
+
+        if task == "mintair_deploy":
+            return await mintair_deploy(
+                self.account_index,
+                self.session,
+                self.zerog_web3,
+                self.config,
+                self.wallet,
+            )
+
+        logger.error(f"{self.account_index} | Task {task} not found")
+        return False
 
     async def sleep(self, task_name: str):
         """Делает рандомную паузу между действиями"""

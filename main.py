@@ -3,6 +3,7 @@ import urllib3
 import sys
 import asyncio
 import platform
+import logging
 
 from process import start
 from src.utils.output import show_logo, show_dev_info
@@ -32,6 +33,11 @@ log_format = (
 def configuration():
     urllib3.disable_warnings()
     logger.remove()
+
+    # Disable primp and web3 logging
+    logging.getLogger("primp").setLevel(logging.WARNING)
+    logging.getLogger("web3").setLevel(logging.WARNING)
+
     logger.add(
         sys.stdout,
         colorize=True,

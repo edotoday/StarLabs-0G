@@ -45,17 +45,17 @@ async def mint_nerzo_0gog(
         logger.info(f"{account_index} | Checking balance of 0G OG (NERZO-0GOG) NFT...")
 
         # Проверяем баланс NFT на кошельке
-        nft_contract = web3.web3.eth.contract(
-            address=web3.web3.to_checksum_address(NERZO_0GOG_CONTRACT), abi=NFT_ABI
-        )
+        # nft_contract = web3.web3.eth.contract(
+        #     address=web3.web3.to_checksum_address(NERZO_0GOG_CONTRACT), abi=NFT_ABI
+        # )
 
-        nft_balance = await nft_contract.functions.balanceOf(wallet.address).call()
+        # nft_balance = await nft_contract.functions.balanceOf(wallet.address).call()
 
-        if nft_balance > 0:
-            logger.success(
-                f"{account_index} | Wallet already has {nft_balance} 0G OG (NERZO-0GOG) NFT"
-            )
-            return True
+        # if nft_balance > 0:
+        #     logger.success(
+        #         f"{account_index} | Wallet already has {nft_balance} 0G OG (NERZO-0GOG) NFT"
+        #     )
+        #     return True
 
         # Проверяем баланс нативной монеты
         balance = await web3.get_balance(wallet.address)
