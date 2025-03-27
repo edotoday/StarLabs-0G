@@ -1,4 +1,4 @@
-TASKS = ["EVERY_DAY"]
+TASKS = ["FAUCET"]
 
 FULL_TASK = [
     "FAUCET",
@@ -36,9 +36,10 @@ SWAPS = ["swaps"]
 FAUCET_TOKENS = ["faucet_tokens"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
 CONFT_APP = ["conft_mint"]
-MINT_AURA = ["mint_aura"]
 MINT_PANDA_0G = ["mint_panda_0g"]
 MINTAIR_DEPLOY = ["mintair_deploy"]
+EASYNODE_DEPLOY = ["easynode_deploy"]
+
 """
 EN:
 You can create your own task with the modules you need 
@@ -91,7 +92,7 @@ faucet_tokens - faucet ETH/BTC/USDT tokens (needs A0GI balance)
 swaps - swaps tokens randomly on 0g hub
 storagescan_deploy - deploy storagescan file
 conft_mint - mint conftApp nft (once per wallet) and mint Domain
-mint_aura - mint aura panda nft (once per wallet) - https://www.mintaura.io/panda
 mint_panda_0g - mint panda 0g nft (once per wallet) - https://nerzo.xyz/0gog
 mintair_deploy - deploy contract at https://contracts.mintair.xyz/
+easynode_deploy - deploy contract at https://playground.easy-node.xyz/
 """

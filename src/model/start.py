@@ -4,7 +4,7 @@ import primp
 import random
 import asyncio
 
-from src.model.projects.deploy import mintair_deploy
+from src.model.projects.deploy import mintair_deploy, easynode_deploy
 from src.model.projects.mints import mintaura_panda, mint_nerzo_0gog
 from src.model.projects.domains import conft_app
 from src.model.help.stats import WalletStats
@@ -253,6 +253,15 @@ class Start:
 
         if task == "mintair_deploy":
             return await mintair_deploy(
+                self.account_index,
+                self.session,
+                self.zerog_web3,
+                self.config,
+                self.wallet,
+            )
+
+        if task == "easynode_deploy":
+            return await easynode_deploy(
                 self.account_index,
                 self.session,
                 self.zerog_web3,
