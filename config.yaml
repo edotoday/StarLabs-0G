@@ -63,7 +63,7 @@ HUB_0G_SWAPS:
 
 
 RPCS:
-    ZEROG: ["https://16600.rpc.thirdweb.com/"]
+    ZEROG: ["https://og-testnet-evm.itrocket.net/"]
 
 
 CAPTCHA:
