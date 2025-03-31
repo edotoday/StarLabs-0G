@@ -1,3 +1,3 @@
 from .stats import WalletStats
-
-__all__ = ["WalletStats"]
+from .captcha import Solvium
+__all__ = ["WalletStats", "Solvium"]

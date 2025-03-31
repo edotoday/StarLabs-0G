@@ -2,7 +2,7 @@ import asyncio
 import random
 from loguru import logger
 from eth_account import Account
-from src.model.help.captcha import NoCaptcha
+from src.model.help.captcha import NoCaptcha, Solvium
 from src.model.onchain.web3_custom import Web3Custom
 import primp
 
@@ -38,21 +38,41 @@ async def faucet(
     web3: Web3Custom,
     config: Config,
     wallet: Account,
+    proxy: str,
 ):
     try:
         logger.info(f"{account_index} | Starting faucet...")
 
-        nocaptcha_client = NoCaptcha(config.CAPTCHA.NOCAPTCHA_API_KEY, session=session)
-        result = await nocaptcha_client.solve_hcaptcha(
-            sitekey="1230eb62-f50c-4da4-a736-da5c3c342e8e",
-            referer="https://hub.0g.ai",
-            invisible=False,
-        )
+        if config.CAPTCHA.USE_NOCAPTCHA:
+            logger.info(
+                f"[{account_index}] | Solving hCaptcha challenge with NoCaptcha..."
+            )
+            nocaptcha_client = NoCaptcha(config.CAPTCHA.NOCAPTCHA_API_KEY, session=session)
+            result = await nocaptcha_client.solve_hcaptcha(
+                sitekey="1230eb62-f50c-4da4-a736-da5c3c342e8e",
+                referer="https://hub.0g.ai",
+                invisible=False,
+            )
+            captcha_token = result["generated_pass_UUID"]
 
-        if result is None:
+        else:
+            logger.info(
+                f"[{account_index}] | Solving hCaptcha challenge with Solvium..."
+            )
+            solvium = Solvium(
+                api_key=config.CAPTCHA.SOLVIUM_API_KEY,
+                session=session,
+                proxy=proxy,
+            )
+
+            captcha_token = await solvium.solve_captcha(
+                sitekey="1230eb62-f50c-4da4-a736-da5c3c342e8e",
+                pageurl="https://hub.0g.ai",
+            )
+    
+        if captcha_token is None:
             raise Exception("Captcha not solved")
 
-        captcha_token = result["generated_pass_UUID"]
         logger.success(f"{account_index} | Captcha solved for faucet")
 
         headers = {

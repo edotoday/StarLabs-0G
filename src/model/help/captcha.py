@@ -383,3 +383,97 @@ class NoCaptcha:
         except Exception as e:
             logger.error(f"Error solving hCaptcha: {e}")
             return None
+
+
+class Solvium:
+    def __init__(
+        self, 
+        api_key: str, 
+        session: AsyncClient,
+        proxy: Optional[str] = None,
+
+    ):
+        self.api_key = api_key
+        self.proxy = proxy
+        self.base_url = "https://captcha.solvium.io/api/v1"
+        self.session = session
+
+    def _format_proxy(self, proxy: str) -> str:
+        if not proxy:
+            return None
+        if "@" in proxy:
+            return proxy
+        return f"http://{proxy}"
+
+    async def create_turnstile_task(self, sitekey: str, pageurl: str) -> Optional[str]:
+        """Creates a Turnstile captcha solving task"""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        url = f"{self.base_url}/task/noname?url={pageurl}&sitekey={sitekey}&ref=starlabs"
+
+        # if self.proxy:
+        #     formatted_proxy = self._format_proxy(self.proxy)
+        #     url += f"&proxy={formatted_proxy}"
+
+        try:
+            response = await self.session.get(url, headers=headers, timeout=30)
+            result = response.json()
+            
+            if result.get("message") == "Task created" and "task_id" in result:
+                return result["task_id"]
+
+            logger.error(f"Error creating Turnstile task with Solvium: {result}")
+            return None
+
+        except Exception as e:
+            logger.error(f"Error creating Turnstile task with Solvium: {e}")
+            return None
+
+    async def get_task_result(self, task_id: str) -> Optional[str]:
+        """Gets the result of the captcha solution"""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        max_attempts = 30
+        for _ in range(max_attempts):
+            try:
+                response = await self.session.get(
+                    f"{self.base_url}/task/status/{task_id}",
+                    headers=headers,
+                    timeout=30,
+                )
+                
+                result = response.json()
+
+                # Проверяем статус задачи
+                if result.get("status") == "completed" and result.get("result") and result["result"].get("solution"):
+                    solution = result["result"]["solution"]
+                    
+                    return solution
+                        
+                elif result.get("status") == "running" or result.get("status") == "pending":
+                    # Задача еще выполняется, ждем
+                    await asyncio.sleep(5)
+                    continue
+                else:
+                    # Ошибка или неизвестный статус
+                    logger.error(f"Error getting result with Solvium: {result}")
+                    return None
+
+            except Exception as e:
+                logger.error(f"Error getting result with Solvium: {e}")
+                return None
+
+        logger.error("Max polling attempts reached without getting a result with Solvium")
+        return None
+
+    async def solve_captcha(self, sitekey: str, pageurl: str) -> Optional[str]:
+        """Solves Cloudflare Turnstile captcha and returns token"""
+        task_id = await self.create_turnstile_task(sitekey, pageurl)
+        if not task_id:
+            return None
+
+        return await self.get_task_result(task_id)

@@ -196,6 +196,7 @@ class Start:
                 self.zerog_web3,
                 self.config,
                 self.wallet,
+                self.proxy,
             )
 
         if task == "faucet_tokens":

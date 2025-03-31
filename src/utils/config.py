@@ -37,8 +37,9 @@ class Hub0gSwapsConfig:
 
 @dataclass
 class CaptchaConfig:
+    SOLVIUM_API_KEY: str
     NOCAPTCHA_API_KEY: str
-
+    USE_NOCAPTCHA: bool
 
 @dataclass
 class RpcsConfig:
@@ -135,7 +136,9 @@ class Config:
                 NUMBER_OF_SWAPS=tuple(data["HUB_0G_SWAPS"]["NUMBER_OF_SWAPS"]),
             ),
             CAPTCHA=CaptchaConfig(
+                SOLVIUM_API_KEY=data["CAPTCHA"]["SOLVIUM_API_KEY"],
                 NOCAPTCHA_API_KEY=data["CAPTCHA"]["NOCAPTCHA_API_KEY"],
+                USE_NOCAPTCHA=data["CAPTCHA"]["USE_NOCAPTCHA"],
             ),
             RPCS=RpcsConfig(
                 ZEROG=data["RPCS"]["ZEROG"],

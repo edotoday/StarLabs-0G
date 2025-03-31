@@ -67,9 +67,16 @@ RPCS:
 
 
 CAPTCHA:
+    # API KEY for solvium
+    # https://t.me/solvium_crypto_bot
+    # https://t.me/solvium_crypto_bot
+    SOLVIUM_API_KEY: "xxxxxxxxxxxxxxxxxxxxx"
+
+
+    USE_NOCAPTCHA: false
     # nocaptcha.io/register?c=SWVtru
     # API KEY for faucet
-    NOCAPTCHA_API_KEY: "123"
+    NOCAPTCHA_API_KEY: "xxxxxxxxxxxxxxxxxx"
 
 
 OTHERS:

@@ -1248,6 +1248,13 @@ function renderConfig(config) {
                     { key: 'TELEGRAM_BOT_TOKEN', value: config[key]['TELEGRAM_BOT_TOKEN'] },
                     { key: 'TELEGRAM_USERS_IDS', value: config[key]['TELEGRAM_USERS_IDS'], isSpaceList: true }
                 ], key);
+            } else if (key === 'CAPTCHA') {
+                // Специальная обработка для Captcha
+                createCard(cardsContainer, 'Captcha Settings', 'robot', [
+                    { key: 'SOLVIUM_API_KEY', value: config[key]['SOLVIUM_API_KEY'] },
+                    { key: 'NOCAPTCHA_API_KEY', value: config[key]['NOCAPTCHA_API_KEY'] },
+                    { key: 'USE_NOCAPTCHA', value: config[key]['USE_NOCAPTCHA'], isCheckbox: true }
+                ], key);
             } else if (key === 'RPCS') {
                 // Специальная обработка для RPCs
                 createCard(cardsContainer, 'RPC Settings', 'network-wired', 
@@ -1324,6 +1331,14 @@ function createTextField(container, key, value, path) {
     input.className = 'field-input';
     input.value = value;
     input.dataset.configPath = path;
+    
+    // Добавляем подсказку для API ключей
+    if (key.includes('API_KEY')) {
+        const tooltip = document.createElement('span');
+        tooltip.className = 'tooltip';
+        tooltip.innerHTML = '?<span class="tooltip-text">Enter your API key here</span>';
+        label.appendChild(tooltip);
+    }
     
     if (typeof value === 'number') {
         input.dataset.type = 'number';

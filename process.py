@@ -34,7 +34,7 @@ async def start():
         logger.info("Continue with current version\n")
 
     print("\nAvailable options:\n")
-    print("[1] ⭐️Start farming")
+    print("[1] ⭐️ Start farming")
     print("[2] 🔧 Edit config")
     print("[3] 💾 Database actions")
     print("[4] 👋 Exit")
