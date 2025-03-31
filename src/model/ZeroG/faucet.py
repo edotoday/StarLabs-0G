@@ -74,8 +74,17 @@ async def faucet(
         json_data = {
             "address": wallet.address,
             "hcaptchaToken": captcha_token,
-            "token": "A0GI",
+            'token': {
+                'name': 'A0GI',
+                'symbol': 'A0GI',
+                'logoUrl': 'https://s3.ap-northeast-2.amazonaws.com/upload.xangle.io/images/project/676ce0a44b1980a54df08249/64.png',
+                'chainId': 16600,
+                'address': '',
+                'decimals': 18,
+                'bridgeInfo': [],
+            },
         }
+
 
         response = await session.post(
             "https://992dkn4ph6.execute-api.us-west-1.amazonaws.com/",
@@ -149,7 +158,7 @@ async def mint_token(
         tx_params = {
             "from": wallet.address,
             "value": 0,
-            "nonce": await web3.web3.eth.get_transaction_count(wallet.address),
+            "nonce": await web3.web3.eth.get_transaction_count(wallet.address, 'pending'),
             "chainId": CHAIN_ID,
             **gas_params,
         }
