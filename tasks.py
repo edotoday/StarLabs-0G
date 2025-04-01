@@ -1,11 +1,11 @@
-TASKS = ["FAUCET"]
+TASKS = ["CONFT_MINT"]
 
 FULL_TASK = [
     "FAUCET",
     "FAUCET_TOKENS",
     "SWAPS",
     "STORAGESCAN_DEPLOY",
-    "CONFT_APP",
+    "CONFT_MINT",
     "MINTAIR_DEPLOY",
     "MINT_PANDA_0G",
     "MINT_NERZO_0GOG",
@@ -13,7 +13,7 @@ FULL_TASK = [
 
 ONLY_SWAPS = [
     "STORAGESCAN_DEPLOY",
-    "CONFT_APP",
+    "CONFT_MINT",
     "SWAPS",
 ]
 
@@ -25,7 +25,7 @@ EVERY_DAY = [
         "MINT_PANDA_0G",
         "MINT_NERZO_0GOG",
         "STORAGESCAN_DEPLOY",
-        "CONFT_APP",
+        "CONFT_MINT",
         "MINTAIR_DEPLOY",
     ),
     "SWAPS",
@@ -35,7 +35,7 @@ FAUCET = ["faucet"]
 SWAPS = ["swaps"]
 FAUCET_TOKENS = ["faucet_tokens"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
-CONFT_APP = ["conft_mint"]
+CONFT_MINT = ["conft_mint"]
 MINT_PANDA_0G = ["mint_panda_0g"]
 MINTAIR_DEPLOY = ["mintair_deploy"]
 EASYNODE_DEPLOY = ["easynode_deploy"]
