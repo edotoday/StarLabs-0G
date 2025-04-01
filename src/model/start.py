@@ -189,6 +189,9 @@ class Start:
         """Execute a single task"""
         task = task.lower()
 
+        if task == "skip":
+            return True
+        
         if task == "faucet":
             return await faucet(
                 self.account_index,
