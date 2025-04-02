@@ -4,7 +4,7 @@ import primp
 import random
 import asyncio
 
-from src.model.projects.deploy import mintair_deploy, easynode_deploy
+from src.model.projects.deploy import memebridge_deploy, mintair_deploy, easynode_deploy
 from src.model.projects.mints import mintaura_panda, mint_nerzo_0gog
 from src.model.projects.domains import conft_app
 from src.model.help.stats import WalletStats
@@ -273,6 +273,15 @@ class Start:
                 self.wallet,
             )
 
+        if task == "memebridge_deploy":
+            return await memebridge_deploy(
+                self.account_index,
+                self.session,
+                self.zerog_web3,
+                self.config,
+                self.wallet,
+            )
+        
         logger.error(f"{self.account_index} | Task {task} not found")
         return False
 

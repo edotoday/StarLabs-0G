@@ -1,4 +1,4 @@
-TASKS = ["CONFT_MINT"]
+TASKS = ["FULL_TASK"]
 
 FULL_TASK = [
     "FAUCET",
@@ -39,7 +39,7 @@ CONFT_MINT = ["conft_mint"]
 MINT_PANDA_0G = ["mint_panda_0g"]
 MINTAIR_DEPLOY = ["mintair_deploy"]
 EASYNODE_DEPLOY = ["easynode_deploy"]
-
+MEMEBRIDGE_DEPLOY = ["memebridge_deploy"]
 """
 EN:
 You can create your own task with the modules you need 
@@ -95,4 +95,5 @@ conft_mint - mint conftApp nft (once per wallet) and mint Domain
 mint_panda_0g - mint panda 0g nft (once per wallet) - https://nerzo.xyz/0gog
 mintair_deploy - deploy contract at https://contracts.mintair.xyz/
 easynode_deploy - deploy contract at https://playground.easy-node.xyz/
+memebridge_deploy - deploy contract at https://www.memebridge.xyz/deploy
 """

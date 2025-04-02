@@ -193,7 +193,7 @@ class Web3Custom:
                 f"{self.account_index} | Waiting for transaction confirmation..."
             )
             receipt = await self.web3.eth.wait_for_transaction_receipt(
-                tx_hash, poll_latency=2
+                tx_hash, timeout=240, poll_latency=2
             )
 
             if receipt["status"] == 1:
@@ -206,8 +206,12 @@ class Web3Custom:
             else:
                 raise Exception("Transaction failed")
         except Exception as e:
+            error_msg = str(e)
+            if "tx already in mempool" in error_msg:
+                logger.info(f"{self.account_index} | Transaction already in mempool")
+                return True
             logger.error(
-                f"{self.account_index} | Transaction execution failed: {str(e)}"
+                f"{self.account_index} | Transaction execution failed: {error_msg}"
             )
             raise
 
@@ -366,9 +370,7 @@ class Web3Custom:
             # Добавляем 10% к estimated gas для безопасности
             return int(estimated * 2.2)
         except Exception as e:
-            logger.warning(
-                f"{self.account_index} | Error estimating gas: {e}."
-            )
+            logger.warning(f"{self.account_index} | Error estimating gas: {e}.")
             raise e
 
     @classmethod
