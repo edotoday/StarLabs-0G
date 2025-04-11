@@ -186,6 +186,10 @@ def create_required_directories():
                         <i class="fas fa-network-wired"></i>
                         <span>RPCs</span>
                     </div>
+                    <div class="sidebar-item" data-section="puzzlemania">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Puzzlemania</span>
+                    </div>
                     <div class="sidebar-item" data-section="others">
                         <i class="fas fa-ellipsis-h"></i>
                         <span>Others</span>
@@ -1199,6 +1203,7 @@ function renderConfig(config) {
         'swaps': { key: 'HUB_0G_SWAPS', title: 'Hub 0G Swaps', icon: 'sync' },
         'captcha': { key: 'CAPTCHA', title: 'Captcha', icon: 'robot' },
         'rpcs': { key: 'RPCS', title: 'RPCs', icon: 'network-wired' },
+        'puzzlemania': { key: 'PUZZLEMANIA', title: 'Puzzlemania', icon: 'puzzle-piece' },
         'others': { key: 'OTHERS', title: 'Others', icon: 'ellipsis-h' }
     };
     
@@ -1269,7 +1274,7 @@ function renderConfig(config) {
                         key: k, 
                         value: v, 
                         isList: true,
-                        isArray: true  // Добавляем флаг для массивов
+                        isArray: true
                     })), 
                     key
                 );
