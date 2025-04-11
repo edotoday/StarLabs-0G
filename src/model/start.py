@@ -4,6 +4,7 @@ import primp
 import random
 import asyncio
 
+from src.model.projects.others.puzzlemania.instance import Puzzlemania
 from src.model.projects.deploy import memebridge_deploy, mintair_deploy, easynode_deploy
 from src.model.projects.mints import mintaura_panda, mint_nerzo_0gog
 from src.model.projects.domains import conft_app
@@ -23,11 +24,13 @@ class Start:
         proxy: str,
         private_key: str,
         config: Config,
+        twitter_token: str,
     ):
         self.account_index = account_index
         self.proxy = proxy
         self.private_key = private_key
         self.config = config
+        self.twitter_token = twitter_token
 
         self.session: primp.AsyncClient | None = None
         self.zerog_web3: Web3Custom | None = None
@@ -282,6 +285,19 @@ class Start:
                 self.wallet,
             )
         
+        if task == "puzzlemania":
+            puzzlemania = Puzzlemania(
+                self.account_index,
+                self.session,
+                self.zerog_web3,
+                self.config,
+                self.wallet,
+                self.proxy,
+                self.private_key,
+                self.twitter_token,
+            )
+            return await puzzlemania.process()
+
         logger.error(f"{self.account_index} | Task {task} not found")
         return False
 

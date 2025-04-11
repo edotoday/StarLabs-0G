@@ -47,6 +47,12 @@ class RpcsConfig:
 
 
 @dataclass
+class PuzzlemaniaConfig:
+    USE_REFERRAL_CODE: bool
+    INVITES_PER_REFERRAL_CODE: Tuple[int, int]
+    COLLECT_REFERRAL_CODE: bool
+
+@dataclass
 class OthersConfig:
     SKIP_SSL_VERIFICATION: bool
     USE_PROXY_FOR_RPC: bool
@@ -74,6 +80,7 @@ class Config:
     CAPTCHA: CaptchaConfig
     RPCS: RpcsConfig
     OTHERS: OthersConfig
+    PUZZLEMANIA: PuzzlemaniaConfig
     WALLETS: WalletsConfig = field(default_factory=WalletsConfig)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
 
@@ -146,6 +153,13 @@ class Config:
             OTHERS=OthersConfig(
                 SKIP_SSL_VERIFICATION=data["OTHERS"]["SKIP_SSL_VERIFICATION"],
                 USE_PROXY_FOR_RPC=data["OTHERS"]["USE_PROXY_FOR_RPC"],
+            ),
+            PUZZLEMANIA=PuzzlemaniaConfig(
+                USE_REFERRAL_CODE=data["PUZZLEMANIA"]["USE_REFERRAL_CODE"],
+                INVITES_PER_REFERRAL_CODE=tuple(
+                    data["PUZZLEMANIA"]["INVITES_PER_REFERRAL_CODE"]
+                ),
+                COLLECT_REFERRAL_CODE=data["PUZZLEMANIA"]["COLLECT_REFERRAL_CODE"],
             ),
         )
 

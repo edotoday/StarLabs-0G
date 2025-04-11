@@ -1255,6 +1255,13 @@ function renderConfig(config) {
                     { key: 'NOCAPTCHA_API_KEY', value: config[key]['NOCAPTCHA_API_KEY'] },
                     { key: 'USE_NOCAPTCHA', value: config[key]['USE_NOCAPTCHA'], isCheckbox: true }
                 ], key);
+            } else if (key === 'PUZZLEMANIA') {
+                // Специальная обработка для Puzzlemania
+                createCard(cardsContainer, 'Puzzlemania Settings', 'puzzle-piece', [
+                    { key: 'USE_REFERRAL_CODE', value: config[key]['USE_REFERRAL_CODE'], isCheckbox: true },
+                    { key: 'INVITES_PER_REFERRAL_CODE', value: config[key]['INVITES_PER_REFERRAL_CODE'] },
+                    { key: 'COLLECT_REFERRAL_CODE', value: config[key]['COLLECT_REFERRAL_CODE'], isCheckbox: true }
+                ], key);
             } else if (key === 'RPCS') {
                 // Специальная обработка для RPCs
                 createCard(cardsContainer, 'RPC Settings', 'network-wired', 

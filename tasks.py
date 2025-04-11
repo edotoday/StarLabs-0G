@@ -1,4 +1,6 @@
-TASKS = ["FULL_TASK"]
+TASKS = ["FAUCET"]
+
+PUZZLEMANIA = ["puzzlemania"]
 
 FULL_TASK = [
     "FAUCET",
@@ -96,4 +98,5 @@ mint_panda_0g - mint panda 0g nft (once per wallet) - https://nerzo.xyz/0gog
 mintair_deploy - deploy contract at https://contracts.mintair.xyz/
 easynode_deploy - deploy contract at https://playground.easy-node.xyz/
 memebridge_deploy - deploy contract at https://www.memebridge.xyz/deploy
+puzzlemania - complete tasks on https://puzzlemania.0g.ai/
 """
