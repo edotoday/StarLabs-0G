@@ -677,7 +677,10 @@ class Puzzlemania:
                                 with open(
                                     "data/referral_codes.txt", "w", encoding="utf-8"
                                 ) as f:
-                                    f.writelines(updated_lines)
+                                    f.writelines(
+                                        line if line.endswith("\n") else f"{line}\n"
+                                        for line in updated_lines
+                                    )
 
                                 logger.success(
                                     f"{self.wallet.address} | Referral code {found_code} updated with {invites} invites!"
