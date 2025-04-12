@@ -207,10 +207,9 @@ class Puzzlemania:
             )
             await asyncio.sleep(pause)
 
-        
         if self.config.PUZZLEMANIA.COLLECT_REFERRAL_CODE:
             await self.__collect_referral_code()
-            
+
         return success
 
     @retry_async(default_value=False)
@@ -602,7 +601,7 @@ class Puzzlemania:
 
                 case "Like: You Need Decentralized AI":
                     body = constants.LIKE_YOU_NEED_DECENTRALIZED_AI
-                
+
                 case "RT: You Need Decentralized AI":
                     body = constants.RT_YOU_NEED_DECENTRALIZED_AI
 
@@ -623,7 +622,7 @@ class Puzzlemania:
 
                 case "RT: Learn from Ming":
                     body = constants.RT_LEARN_FROM_MING
-                    
+
                 case _:
                     logger.warning(f"{self.wallet.address} | Unknown task: {task_name}")
                     return True
@@ -654,7 +653,7 @@ class Puzzlemania:
                     response.json()["data"]["verifyActivity"]["record"]["status"]
                     == "COMPLETED"
                 ):
-                    if task["title"] == "Campaign registration":
+                    if task_name == "Campaign Registration":
                         if self.config.PUZZLEMANIA.USE_REFERRAL_CODE and found_code:
                             async with self.config.lock:
                                 # Re-read the file to get the latest state
@@ -680,6 +679,9 @@ class Puzzlemania:
                                 ) as f:
                                     f.writelines(updated_lines)
 
+                                logger.success(
+                                    f"{self.wallet.address} | Referral code {found_code} updated with {invites} invites!"
+                                )
                     logger.success(
                         f"{self.wallet.address} | Task {task_name} completed!"
                     )
