@@ -222,6 +222,7 @@ async def mint_token(
         raise
 
 
+@retry_async(default_value=False)
 async def faucet_tokens(
     account_index: int,
     web3: Web3Custom,

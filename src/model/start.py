@@ -189,117 +189,122 @@ class Start:
                 logger.error(f"{self.account_index} | Error during cleanup: {e}")
 
     async def execute_task(self, task):
-        """Execute a single task"""
-        task = task.lower()
+        try:
+            """Execute a single task"""
+            task = task.lower()
 
-        if task == "skip":
-            return True
-        
-        if task == "faucet":
-            return await faucet(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-                self.proxy,
-            )
+            if task == "skip":
+                return True
+            
+            if task == "faucet":
+                return await faucet(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                    self.proxy,
+                )
 
-        if task == "faucet_tokens":
-            return await faucet_tokens(
-                self.account_index,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "faucet_tokens":
+                return await faucet_tokens(
+                    self.account_index,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "storagescan_deploy":
-            return await deploy_storage_scan(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "storagescan_deploy":
+                return await deploy_storage_scan(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "conft_mint":
-            return await conft_app(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "conft_mint":
+                return await conft_app(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "swaps":
-            return await swaps(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "swaps":
+                return await swaps(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "mint_aura":
-            return await mintaura_panda(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "mint_aura":
+                return await mintaura_panda(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "mint_panda_0g":
-            return await mint_nerzo_0gog(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "mint_panda_0g":
+                return await mint_nerzo_0gog(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "mintair_deploy":
-            return await mintair_deploy(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "mintair_deploy":
+                return await mintair_deploy(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "easynode_deploy":
-            return await easynode_deploy(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
+            if task == "easynode_deploy":
+                return await easynode_deploy(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
 
-        if task == "memebridge_deploy":
-            return await memebridge_deploy(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-            )
-        
-        if task == "puzzlemania":
-            puzzlemania = Puzzlemania(
-                self.account_index,
-                self.session,
-                self.zerog_web3,
-                self.config,
-                self.wallet,
-                self.proxy,
-                self.private_key,
-                self.twitter_token,
-            )
-            return await puzzlemania.process()
+            if task == "memebridge_deploy":
+                return await memebridge_deploy(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
+            
+            if task == "puzzlemania":
+                puzzlemania = Puzzlemania(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                    self.proxy,
+                    self.private_key,
+                    self.twitter_token,
+                )
+                return await puzzlemania.process()
 
-        logger.error(f"{self.account_index} | Task {task} not found")
-        return False
+            logger.error(f"{self.account_index} | Task {task} not found")
+            return False
+
+        except Exception as e:
+            logger.error(f"{self.account_index} | Global error: {e}")
+            return False
 
     async def sleep(self, task_name: str):
         """Делает рандомную паузу между действиями"""
