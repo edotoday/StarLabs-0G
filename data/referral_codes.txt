@@ -1,1 +1,1 @@
-code:wallet_address:0
+wallet_address:referral_code:0
