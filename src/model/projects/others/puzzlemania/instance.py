@@ -590,42 +590,6 @@ class Puzzlemania:
                 case "Daily check-in":
                     body = constants.DAILY_CHECK_IN
 
-                case "Like: Hype up Guild on 0G projects!":
-                    body = constants.LIKE_HYPE_UP_GUILD_ON_0G_PROJECTS
-
-                case "RT: Hype up Guild on 0G projects!":
-                    body = constants.RT_HYPE_UP_GUILD_ON_0G_PROJECTS
-
-                case "Like: Support One Gravity":
-                    body = constants.LIKE_SUPPORT_ONE_GRAVITY
-
-                case "RT: Support One Gravity":
-                    body = constants.RT_SUPPORT_ONE_GRAVITY
-
-                case "Like: You Need Decentralized AI":
-                    body = constants.LIKE_YOU_NEED_DECENTRALIZED_AI
-
-                case "RT: You Need Decentralized AI":
-                    body = constants.RT_YOU_NEED_DECENTRALIZED_AI
-
-                case "Like: Battle of Agents is coming soon.":
-                    body = constants.LIKE_BATTLE_OF_AGENTS_IS_COMING_SOON
-
-                case "RT: Battle of Agents is coming soon.":
-                    body = constants.RT_BATTLE_OF_AGENTS_IS_COMING_SOON
-
-                case "Like: Guild on 0G with Michael!":
-                    body = constants.LIKE_GUILD_ON_0G_WITH_MICHAEL
-
-                case "RT: Guild on 0G with Michael!":
-                    body = constants.RT_GUILD_ON_0G_WITH_MICHAEL
-
-                case "Like: Learn from Ming":
-                    body = constants.LIKE_LEARN_FROM_MING
-
-                case "RT: Learn from Ming":
-                    body = constants.RT_LEARN_FROM_MING
-
                 case "Like: 600K strong on X!":
                     body = constants.LIKE_600K_STRONG_ON_X
 
