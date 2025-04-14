@@ -188,7 +188,10 @@ class Puzzlemania:
             if records and len(records) > 0:
                 last_record = records[len(records) - 1]
 
-                if last_record["status"] == "COMPLETED":
+                if (
+                    last_record["status"] == "COMPLETED"
+                    and task["title"] != "Daily check-in"
+                ):
                     logger.success(
                         f'{self.wallet.address} | Task "{task["title"]}" already completed!'
                     )
@@ -623,6 +626,13 @@ class Puzzlemania:
                 case "RT: Learn from Ming":
                     body = constants.RT_LEARN_FROM_MING
 
+                case "Like: 600K strong on X!":
+                    body = constants.LIKE_600K_STRONG_ON_X
+
+                case "RT: 600K strong on X!":
+                    body = constants.RT_600K_STRONG_ON_X
+                    
+                    
                 case _:
                     logger.warning(f"{self.wallet.address} | Unknown task: {task_name}")
                     return True
@@ -640,7 +650,10 @@ class Puzzlemania:
                 "https://api.deform.cc/", headers=headers, json=body
             )
 
-            if "User has already completed the activity" in response.text:
+            if (
+                "User has already completed the activity" in response.text
+                or "User needs to wait before trying again" in response.text
+            ):
                 logger.success(
                     f"{self.wallet.address} | Task {task_name} already completed!"
                 )
