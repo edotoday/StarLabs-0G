@@ -596,6 +596,8 @@ class Puzzlemania:
                 case "RT: 600K strong on X!":
                     body = constants.RT_600K_STRONG_ON_X
                     
+                case "Follow Ada Heinrich - MD & CMO, 0G Labs":
+                    body = constants.FOLLOW_ADA_HEINRICH_MD_CMO_0G_LABS
                     
                 case _:
                     logger.warning(f"{self.wallet.address} | Unknown task: {task_name}")

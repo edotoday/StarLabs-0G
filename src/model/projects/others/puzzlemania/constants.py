@@ -147,6 +147,13 @@ RT_600K_STRONG_ON_X = {
 }
 
 
+FOLLOW_ADA_HEINRICH_MD_CMO_0G_LABS = {
+    "operationName": "VerifyActivity",
+    "variables": {"data": {"activityId": "2c8af9a5-28dc-4faf-962c-529f5fd31203"}},
+    "query": "mutation VerifyActivity($data: VerifyActivityInput!) {\n  verifyActivity(data: $data) {\n    record {\n      id\n      activityId\n      status\n      properties\n      createdAt\n      rewardRecords {\n        id\n        status\n        appliedRewardType\n        appliedRewardQuantity\n        appliedRewardMetadata\n        error\n        rewardId\n        reward {\n          id\n          quantity\n          type\n          properties\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    missionRecord {\n      id\n      missionId\n      status\n      createdAt\n      rewardRecords {\n        id\n        status\n        appliedRewardType\n        appliedRewardQuantity\n        appliedRewardMetadata\n        error\n        rewardId\n        reward {\n          id\n          quantity\n          type\n          properties\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}",
+}
+
+
 def get_verify_activity_json(referral_code: str = None) -> dict:
     return {
         "operationName": "VerifyActivity",
