@@ -62,7 +62,7 @@ HUB_0G_SWAPS:
     NUMBER_OF_SWAPS: [1, 3]
 
 
- '''DIFFERENT RPCs
+'''DIFFERENT RPCs
 "https://og-testnet-evm.itrocket.net/",
 "https://16600.rpc.thirdweb.com",
 "https://rpc.ankr.com/0g_newton",
