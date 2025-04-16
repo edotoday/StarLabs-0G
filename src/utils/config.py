@@ -83,7 +83,8 @@ class Config:
     PUZZLEMANIA: PuzzlemaniaConfig
     WALLETS: WalletsConfig = field(default_factory=WalletsConfig)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
-
+    spare_twitter_tokens: List[str] = field(default_factory=list)
+    
     @classmethod
     def load(cls, path: str = "config.yaml") -> "Config":
         """Load configuration from yaml file"""

@@ -287,6 +287,8 @@ class Puzzlemania:
             )
 
             # ++++++++++ #
+            if "Request rate limited. Please try again soon." in response.text:
+                raise Exception("Twitter request rate limited. Please try again soon.")
 
             url = response.json()["url"]
             twitter_client = await create_twitter_client(self.proxy, self.twitter_token)
@@ -317,9 +319,69 @@ class Puzzlemania:
             )
 
             if "Could not authenticate you" in response.text:
-                raise Exception(
-                    "twitter token is invalid. Please check your twitter token!"
+                logger.error(
+                    f"{self.wallet.address} | Twitter token is invalid. Please check your twitter token!"
                 )
+                async with self.config.lock:
+                    if (
+                        not self.config.spare_twitter_tokens
+                        or len(self.config.spare_twitter_tokens) == 0
+                    ):
+                        raise Exception(
+                            "Twitter token is invalid and no spare tokens available. Please check your twitter token!"
+                        )
+
+                    # Get a new token from the spare tokens list
+                    new_token = self.config.spare_twitter_tokens.pop(0)
+                    old_token = self.twitter_token
+                    self.twitter_token = new_token
+
+                    # Update the token in the file
+                    try:
+                        with open(
+                            "data/twitter_tokens.txt", "r", encoding="utf-8"
+                        ) as f:
+                            tokens = f.readlines()
+
+                        # Process tokens to replace old with new and remove duplicates
+                        processed_tokens = []
+                        replaced = False
+
+                        for token in tokens:
+                            stripped_token = token.strip()
+
+                            # Skip if it's a duplicate of the new token
+                            if stripped_token == new_token:
+                                continue
+
+                            # Replace old token with new token
+                            if stripped_token == old_token:
+                                if not replaced:
+                                    processed_tokens.append(f"{new_token}\n")
+                                    replaced = True
+                            else:
+                                processed_tokens.append(token)
+
+                        # If we didn't replace anything (old token not found), add new token
+                        if not replaced:
+                            processed_tokens.append(f"{new_token}\n")
+
+                        with open(
+                            "data/twitter_tokens.txt", "w", encoding="utf-8"
+                        ) as f:
+                            f.writelines(processed_tokens)
+
+                        logger.info(
+                            f"{self.wallet.address} | Replaced invalid Twitter token with a new one"
+                        )
+
+                        # Retry the connection with the new token
+                        raise Exception("Trying again with a new token...")
+                    except Exception as file_err:
+                        logger.error(
+                            f"{self.wallet.address} | Failed to update token in file: {file_err}"
+                        )
+                        raise
 
             auth_code = response.json()["auth_code"]
 
@@ -592,10 +654,10 @@ class Puzzlemania:
 
                 # case "RT: 600K strong on X!":
                 #     body = constants.RT_600K_STRONG_ON_X
-                    
+
                 case "Follow Ada Heinrich - MD & CMO, 0G Labs":
                     body = constants.FOLLOW_ADA_HEINRICH_MD_CMO_0G_LABS
-                
+
                 case "Like: 0G in Korea!":
                     body = constants.LIKE_0G_IN_KOREA
 
@@ -604,7 +666,7 @@ class Puzzlemania:
 
                 case "Like: Tech Updates":
                     body = constants.LIKE_TECH_UPDATES
-                
+
                 case "RT: Tech Updates":
                     body = constants.RT_TECH_UPDATES
 
@@ -619,14 +681,12 @@ class Puzzlemania:
 
                 case "RT: Early access soon":
                     body = constants.RT_EARLY_ACCESS_SOON
-                    
+
                 case "Like: Learn from Ming":
                     body = constants.LIKE_LEARN_FROM_MING
 
                 case "RT: Learn from Ming":
                     body = constants.RT_LEARN_FROM_MING
-                    
-                    
 
                 case _:
                     logger.warning(f"{self.wallet.address} | Unknown task: {task_name}")

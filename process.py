@@ -12,6 +12,7 @@ from src.utils.check_github_version import check_version
 from src.utils.logs import ProgressTracker, create_progress_tracker
 from src.utils.config_browser import run
 
+
 async def start():
     async def launch_wrapper(index, proxy, private_key, twitter_token):
         async with semaphore:
@@ -77,15 +78,26 @@ async def start():
         return
 
     private_keys = src.utils.read_private_keys("data/private_keys.txt")
-    
 
     if "PUZZLEMANIA" in config.FLOW.TASKS:
-        twitter_tokens = src.utils.read_txt_file("twitter tokens", "data/twitter_tokens.txt")
+        twitter_tokens = src.utils.read_txt_file(
+            "twitter tokens", "data/twitter_tokens.txt"
+        )
         if len(twitter_tokens) < len(private_keys):
-            logger.error(f"Not enough twitter tokens. Twitter tokens: {len(twitter_tokens)} < Private keys: {len(private_keys)}")
+            logger.error(
+                f"Not enough twitter tokens. Twitter tokens: {len(twitter_tokens)} < Private keys: {len(private_keys)}"
+            )
             return
+        elif len(twitter_tokens) > len(private_keys):
+            # Store excess Twitter tokens in config
+            config.spare_twitter_tokens = twitter_tokens[len(private_keys) :]
+            twitter_tokens = twitter_tokens[: len(private_keys)]
+            logger.info(
+                f"Stored {len(config.spare_twitter_tokens)} excess Twitter tokens in config.spare_twitter_tokens"
+            )
     else:
         twitter_tokens = [""] * len(private_keys)
+        config.spare_twitter_tokens = []
 
     # Определяем диапазон аккаунтов
     start_index = config.SETTINGS.ACCOUNTS_RANGE[0]
@@ -196,7 +208,9 @@ async def account_flow(
         logger.info(f"[{account_index}] Sleeping for {pause} seconds before start...")
         await asyncio.sleep(pause)
 
-        instance = src.model.Start(account_index, proxy, private_key, config, twitter_token)
+        instance = src.model.Start(
+            account_index, proxy, private_key, config, twitter_token
+        )
 
         result = await wrapper(instance.initialize, config)
         if not result:
