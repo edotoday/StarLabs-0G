@@ -405,10 +405,7 @@ class Puzzlemania:
             )
 
             if response.status_code == 429:
-                logger.error(
-                    f"{self.account_index} | Rate limit exceeded... Please try again later!"
-                )
-                return False
+                raise Exception(f"Rate limit exceeded... Trying again...")
 
             if response.status_code != 200:
                 raise Exception(f"link request failed: {response.text}")
@@ -590,15 +587,47 @@ class Puzzlemania:
                 case "Daily check-in":
                     body = constants.DAILY_CHECK_IN
 
-                case "Like: 600K strong on X!":
-                    body = constants.LIKE_600K_STRONG_ON_X
+                # case "Like: 600K strong on X!":
+                #     body = constants.LIKE_600K_STRONG_ON_X
 
-                case "RT: 600K strong on X!":
-                    body = constants.RT_600K_STRONG_ON_X
+                # case "RT: 600K strong on X!":
+                #     body = constants.RT_600K_STRONG_ON_X
                     
                 case "Follow Ada Heinrich - MD & CMO, 0G Labs":
                     body = constants.FOLLOW_ADA_HEINRICH_MD_CMO_0G_LABS
+                
+                case "Like: 0G in Korea!":
+                    body = constants.LIKE_0G_IN_KOREA
+
+                case "RT: 0G in Korea!":
+                    body = constants.RT_0G_IN_KOREA
+
+                case "Like: Tech Updates":
+                    body = constants.LIKE_TECH_UPDATES
+                
+                case "RT: Tech Updates":
+                    body = constants.RT_TECH_UPDATES
+
+                case "Like: What's your dream AI battle?":
+                    body = constants.LIKE_WHAT_S_YOUR_DREAM_AI_BATTLE
+
+                case "Reply: What's your dream AI battle?":
+                    body = constants.RT_WHAT_S_YOUR_DREAM_AI_BATTLE
+
+                case "Like: Early access soon":
+                    body = constants.LIKE_EARLY_ACCESS_SOON
+
+                case "RT: Early access soon":
+                    body = constants.RT_EARLY_ACCESS_SOON
                     
+                case "Like: Learn from Ming":
+                    body = constants.LIKE_LEARN_FROM_MING
+
+                case "RT: Learn from Ming":
+                    body = constants.RT_LEARN_FROM_MING
+                    
+                    
+
                 case _:
                     logger.warning(f"{self.wallet.address} | Unknown task: {task_name}")
                     return True
