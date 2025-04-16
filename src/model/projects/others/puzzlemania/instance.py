@@ -469,6 +469,71 @@ class Puzzlemania:
             if response.status_code == 429:
                 raise Exception(f"Rate limit exceeded... Trying again...")
 
+            if "linked_to_another_user" in response.text:
+                logger.error(
+                    f"{self.wallet.address} | Twitter account is already linked to another user!"
+                )
+                async with self.config.lock:
+                    if (
+                        not self.config.spare_twitter_tokens
+                        or len(self.config.spare_twitter_tokens) == 0
+                    ):
+                        raise Exception(
+                            "Twitter token is linked to another user and no spare tokens available. Please check your twitter token!"
+                        )
+
+                    # Get a new token from the spare tokens list
+                    new_token = self.config.spare_twitter_tokens.pop(0)
+                    old_token = self.twitter_token
+                    self.twitter_token = new_token
+
+                    # Update the token in the file
+                    try:
+                        with open(
+                            "data/twitter_tokens.txt", "r", encoding="utf-8"
+                        ) as f:
+                            tokens = f.readlines()
+
+                        # Process tokens to replace old with new and remove duplicates
+                        processed_tokens = []
+                        replaced = False
+
+                        for token in tokens:
+                            stripped_token = token.strip()
+
+                            # Skip if it's a duplicate of the new token
+                            if stripped_token == new_token:
+                                continue
+
+                            # Replace old token with new token
+                            if stripped_token == old_token:
+                                if not replaced:
+                                    processed_tokens.append(f"{new_token}\n")
+                                    replaced = True
+                            else:
+                                processed_tokens.append(token)
+
+                        # If we didn't replace anything (old token not found), add new token
+                        if not replaced:
+                            processed_tokens.append(f"{new_token}\n")
+
+                        with open(
+                            "data/twitter_tokens.txt", "w", encoding="utf-8"
+                        ) as f:
+                            f.writelines(processed_tokens)
+
+                        logger.info(
+                            f"{self.wallet.address} | Replaced Twitter token linked to another user with a new one"
+                        )
+
+                        # Retry the connection with the new token
+                        raise Exception("Trying again with a new token...")
+                    except Exception as file_err:
+                        logger.error(
+                            f"{self.wallet.address} | Failed to update token in file: {file_err}"
+                        )
+                        raise
+
             if response.status_code != 200:
                 raise Exception(f"link request failed: {response.text}")
             else:
