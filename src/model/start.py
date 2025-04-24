@@ -9,7 +9,7 @@ from src.model.projects.deploy import memebridge_deploy, mintair_deploy, easynod
 from src.model.projects.mints import mintaura_panda, mint_nerzo_0gog
 from src.model.projects.domains import conft_app
 from src.model.help.stats import WalletStats
-from src.model.ZeroG import faucet, faucet_tokens, deploy_storage_scan, swaps
+from src.model.ZeroG import faucets, faucet_tokens, deploy_storage_scan, swaps
 from src.model.onchain.web3_custom import Web3Custom
 from src.utils.client import create_client
 from src.utils.config import Config
@@ -197,13 +197,14 @@ class Start:
                 return True
             
             if task == "faucet":
-                return await faucet(
+                return await faucets(
                     self.account_index,
                     self.session,
                     self.zerog_web3,
                     self.config,
                     self.wallet,
                     self.proxy,
+                    self.twitter_token,
                 )
 
             if task == "faucet_tokens":

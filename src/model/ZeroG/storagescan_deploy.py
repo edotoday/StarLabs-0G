@@ -14,8 +14,8 @@ from src.utils.decorators import retry_async
 from src.utils.config import Config
 from src.utils.constants import EXPLORER_URL_0G
 
-STORAGE_SCAN_CONTRACT = "0x0460aA47b41a66694c0a73f667a1b795A5ED3556"
-CHAIN_ID = 16600
+STORAGE_SCAN_CONTRACT = "0x56A565685C9992BF5ACafb940ff68922980DBBC5"
+CHAIN_ID = 80087
 
 
 @retry_async(default_value=False)
@@ -91,7 +91,7 @@ async def deploy_storage_scan(
 
         # Set transaction type based on gas params
         if "maxFeePerGas" in gas_params:
-            tx_params["type"] = 2
+            tx_params["type"] = "0x2"  # Use hex string format
 
         # Try to estimate gas
         try:

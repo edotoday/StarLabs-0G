@@ -9,6 +9,10 @@ import primp
 from src.utils.decorators import retry_async
 from src.utils.config import Config
 from src.utils.constants import EXPLORER_URL_0G
+from src.utils.client import (
+    create_client,
+    create_twitter_client,
+)
 
 # Token Contract Constants
 FAUCET_CONTRACTS = {
@@ -17,7 +21,7 @@ FAUCET_CONTRACTS = {
     "BTC": "0x1E0D871472973c562650E991ED8006549F8CBEfc",
 }
 
-CHAIN_ID = 16600
+CHAIN_ID = 80087
 MINT_ABI = [
     {
         "name": "mint",
@@ -31,26 +35,301 @@ MINT_ABI = [
 ]
 
 
-@retry_async(default_value=False)
-async def faucet(
+async def faucets(
     account_index: int,
     session: primp.AsyncClient,
     web3: Web3Custom,
     config: Config,
     wallet: Account,
     proxy: str,
+    twitter_token: str,
+):
+    try:
+        logger.info(f"{account_index} | Starting faucets...")
+
+        success_default, success_mictonode = False, False
+
+        oauth_token, oauth_verifier = await _connect_twitter(
+            account_index, session, web3, config, wallet, proxy, twitter_token
+        )
+
+        if not oauth_token or not oauth_verifier:
+            logger.error(f"{account_index} | Failed to connect to Twitter.")
+            raise Exception("Failed to connect to Twitter.")
+
+        logger.success(f"{account_index} | Twitter connected successfully")
+
+        success_default = await default_faucet(
+            account_index,
+            session,
+            web3,
+            config,
+            wallet,
+            proxy,
+            oauth_token,
+            oauth_verifier,
+        )
+
+        # success_mictonode = await mictonode_faucet(
+        #     account_index,
+        #     session,
+        #     web3,
+        #     config,
+        #     wallet,
+        #     proxy,
+        # )
+
+        if success_default or success_mictonode:
+            logger.success(f"{account_index} | Successfully completed faucets")
+            return True
+        else:
+            logger.warning(f"{account_index} | All faucets failed")
+            return False
+
+    except Exception as e:
+        logger.error(f"{account_index} | Faucets error: {e}")
+        return False
+
+
+@retry_async(default_value=False)
+async def _connect_twitter(
+    account_index: int,
+    session: primp.AsyncClient,
+    web3: Web3Custom,
+    config: Config,
+    wallet: Account,
+    proxy: str,
+    twitter_token: str,
+) -> tuple[str, str]:
+    try:
+        headers = {
+            "sec-ch-ua-platform": '"Windows"',
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+            "sec-ch-ua": '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
+            "sec-ch-ua-mobile": "?0",
+            "accept": "*/*",
+            "origin": "https://faucet.0g.ai",
+            "sec-fetch-site": "same-origin",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-dest": "empty",
+            "referer": "https://faucet.0g.ai/",
+            "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
+            "priority": "u=1, i",
+        }
+
+        response = await session.post(
+            "https://faucet.0g.ai/api/request-token", headers=headers
+        )
+
+        oauth_token = response.json()["url"].split("oauth_token=")[1].strip()
+
+        twitter_client = await create_twitter_client(proxy, twitter_token)
+
+        headers = {
+            "sec-ch-ua": '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "sec-fetch-site": "cross-site",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-user": "?1",
+            "sec-fetch-dest": "document",
+            "referer": "https://faucet.0g.ai/",
+            "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
+            "priority": "u=0, i",
+        }
+
+        params = {
+            "oauth_token": oauth_token,
+        }
+
+        response = await twitter_client.get(
+            "https://api.x.com/oauth/authenticate", params=params, headers=headers
+        )
+
+        if "Could not authenticate you" in response.text:
+            logger.error(
+                f"{account_index} | Twitter token is invalid. Please check your twitter token!"
+            )
+            async with config.lock:
+                if (
+                    not config.spare_twitter_tokens
+                    or len(config.spare_twitter_tokens) == 0
+                ):
+                    raise Exception(
+                        "Twitter token is invalid and no spare tokens available. Please check your twitter token!"
+                    )
+
+                # Get a new token from the spare tokens list
+                new_token = config.spare_twitter_tokens.pop(0)
+                old_token = twitter_token
+                twitter_token = new_token
+
+                # Update the token in the file
+                try:
+                    with open("data/twitter_tokens.txt", "r", encoding="utf-8") as f:
+                        tokens = f.readlines()
+
+                    # Process tokens to replace old with new and remove duplicates
+                    processed_tokens = []
+                    replaced = False
+
+                    for token in tokens:
+                        stripped_token = token.strip()
+
+                        # Skip if it's a duplicate of the new token
+                        if stripped_token == new_token:
+                            continue
+
+                        # Replace old token with new token
+                        if stripped_token == old_token:
+                            if not replaced:
+                                processed_tokens.append(f"{new_token}\n")
+                                replaced = True
+                        else:
+                            processed_tokens.append(token)
+
+                    # If we didn't replace anything (old token not found), add new token
+                    if not replaced:
+                        processed_tokens.append(f"{new_token}\n")
+
+                    with open("data/twitter_tokens.txt", "w", encoding="utf-8") as f:
+                        f.writelines(processed_tokens)
+
+                    logger.info(
+                        f"{account_index} | Replaced invalid Twitter token with a new one"
+                    )
+
+                    # Retry the connection with the new token
+                    raise Exception("Trying again with a new token...")
+                except Exception as file_err:
+                    logger.error(
+                        f"{account_index} | Failed to update token in file: {file_err}"
+                    )
+                    raise
+
+        if 'name="authenticity_token" value="' in response.text:
+            authenticity_token = response.text.split(
+                'name="authenticity_token" value="'
+            )[1].split('"')[0]
+        else:
+            authenticity_token = response.text.split(
+                'name="authenticity_token" type="hidden" value="'
+            )[1].split('"')[0]
+
+        headers = {
+            "cache-control": "max-age=0",
+            "sec-ch-ua": '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "origin": "https://api.x.com",
+            "content-type": "application/x-www-form-urlencoded",
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "sec-fetch-site": "same-site",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-user": "?1",
+            "sec-fetch-dest": "document",
+            "referer": "https://api.x.com/",
+            "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
+            "priority": "u=0, i",
+        }
+
+        data = {
+            "authenticity_token": authenticity_token,
+            "oauth_token": oauth_token,
+        }
+
+        response = await twitter_client.post(
+            "https://x.com/oauth/authorize", headers=headers, data=data
+        )
+
+        oauth_verifier = response.text.split("oauth_verifier=")[1].split('"')[0]
+
+        # headers = {
+        #     'sec-ch-ua': '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
+        #     'sec-ch-ua-mobile': '?0',
+        #     'sec-ch-ua-platform': '"Windows"',
+        #     'upgrade-insecure-requests': '1',
+        #     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+        #     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        #     'sec-fetch-site': 'cross-site',
+        #     'sec-fetch-mode': 'navigate',
+        #     'sec-fetch-dest': 'document',
+        #     'referer': 'https://x.com/',
+        #     'accept-language': 'ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4',
+        #     'priority': 'u=0, i',
+        # }
+
+        # params = {
+        #     'oauth_token': oauth_token,
+        #     'oauth_verifier': oauth_verifier,
+        # }
+
+        # response = await session.get('https://faucet.0g.ai/api/x-callback', params=params, headers=headers)
+
+        headers = {
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "sec-fetch-site": "cross-site",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-dest": "document",
+            "sec-ch-ua": '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "referer": "https://x.com/",
+            "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
+            "priority": "u=0, i",
+        }
+
+        params = {
+            "oauth_token": oauth_token,
+            "oauth_verifier": oauth_verifier,
+        }
+
+        response = await session.get(
+            "https://faucet.0g.ai/", params=params, headers=headers
+        )
+
+        return oauth_token, oauth_verifier
+
+    except Exception as e:
+        logger.error(f"{account_index} | Connect faucet twitter error: {e}")
+        raise e
+
+
+@retry_async(default_value=False)
+async def default_faucet(
+    account_index: int,
+    session: primp.AsyncClient,
+    web3: Web3Custom,
+    config: Config,
+    wallet: Account,
+    proxy: str,
+    oauth_token: str,
+    oauth_verifier: str,
 ):
     try:
         logger.info(f"{account_index} | Starting faucet...")
+
+        if not oauth_token or not oauth_verifier:
+            logger.error(f"{account_index} | Failed to connect to Twitter.")
+            raise Exception("Failed to connect to Twitter.")
 
         if config.CAPTCHA.USE_NOCAPTCHA:
             logger.info(
                 f"[{account_index}] | Solving hCaptcha challenge with NoCaptcha..."
             )
-            nocaptcha_client = NoCaptcha(config.CAPTCHA.NOCAPTCHA_API_KEY, session=session)
+            nocaptcha_client = NoCaptcha(
+                config.CAPTCHA.NOCAPTCHA_API_KEY, session=session
+            )
             result = await nocaptcha_client.solve_hcaptcha(
-                sitekey="1230eb62-f50c-4da4-a736-da5c3c342e8e",
-                referer="https://hub.0g.ai",
+                sitekey="914e63b4-ac20-4c24-bc92-cdb6950ccfde",
+                referer="https://faucet.0g.ai/",
                 invisible=False,
             )
             captcha_token = result["generated_pass_UUID"]
@@ -66,51 +345,52 @@ async def faucet(
             )
 
             captcha_token = await solvium.solve_captcha(
-                sitekey="1230eb62-f50c-4da4-a736-da5c3c342e8e",
-                pageurl="https://hub.0g.ai",
+                sitekey="914e63b4-ac20-4c24-bc92-cdb6950ccfde",
+                pageurl="https://faucet.0g.ai/",
             )
-    
+
         if captcha_token is None:
             raise Exception("Captcha not solved")
 
         logger.success(f"{account_index} | Captcha solved for faucet")
 
+        # curl_client = await create_curl_client(proxy)
+
         headers = {
-            "accept": "application/json, text/plain, */*",
-            "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,ru;q=0.7,zh-TW;q=0.6,zh;q=0.5",
-            "content-type": "application/json",
-            "origin": "https://hub.0g.ai",
-            "priority": "u=1, i",
-            "referer": "https://hub.0g.ai/",
-            "sec-ch-ua": '"Not(A:Brand";v="99", "Google Chrome";v="133", "Chromium";v="133"',
-            "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
-            "sec-fetch-dest": "empty",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "sec-ch-ua": '"Google Chrome";v="131", "Not-A.Brand";v="8", "Chromium";v="131"',
+            "content-type": "text/plain;charset=UTF-8",
+            "sec-ch-ua-mobile": "?0",
+            "accept": "*/*",
+            "origin": "https://faucet.0g.ai",
+            "sec-fetch-site": "same-origin",
             "sec-fetch-mode": "cors",
-            "sec-fetch-site": "cross-site",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+            "sec-fetch-dest": "empty",
+            "referer": f"https://faucet.0g.ai/?oauth_token={oauth_token}&oauth_verifier={oauth_verifier}",
+            "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
+            "priority": "u=1, i",
         }
 
         json_data = {
             "address": wallet.address,
             "hcaptchaToken": captcha_token,
-            'token': {
-                'name': 'A0GI',
-                'symbol': 'A0GI',
-                'logoUrl': 'https://s3.ap-northeast-2.amazonaws.com/upload.xangle.io/images/project/676ce0a44b1980a54df08249/64.png',
-                'chainId': 16600,
-                'address': '',
-                'decimals': 18,
-                'bridgeInfo': [],
-            },
+            "oauth_token": oauth_token,
+            "oauth_verifier": oauth_verifier,
         }
 
-
         response = await session.post(
-            "https://992dkn4ph6.execute-api.us-west-1.amazonaws.com/",
-            headers=headers,
-            json=json_data,
+            "https://faucet.0g.ai/api/faucet", headers=headers, json=json_data
         )
+
+        if "hours before requesting again" in response.text:
+            logger.success(
+                f"{account_index} | Faucet already requested today. {response.text}"
+            )
+            return True
+
+        if "Internal Server Error" in response.text:
+            raise Exception(f"Faucet is just a piece of shit. Trying again...")
 
         if "Service is busy. Please retry later." in response.text:
             random_pause = random.randint(
@@ -178,7 +458,9 @@ async def mint_token(
         tx_params = {
             "from": wallet.address,
             "value": 0,
-            "nonce": await web3.web3.eth.get_transaction_count(wallet.address, 'pending'),
+            "nonce": await web3.web3.eth.get_transaction_count(
+                wallet.address, "pending"
+            ),
             "chainId": CHAIN_ID,
             **gas_params,
         }
@@ -289,6 +571,171 @@ async def faucet_tokens(
         )
         logger.error(
             f"{account_index} | Faucet tokens error: {e}. Sleeping {random_pause} seconds..."
+        )
+        await asyncio.sleep(random_pause)
+        raise
+
+
+@retry_async(default_value=False)
+async def mictonode_faucet(
+    account_index: int,
+    session: primp.AsyncClient,
+    web3: Web3Custom,
+    config: Config,
+    wallet: Account,
+    proxy: str,
+):
+    try:
+
+
+        logger.info(f"{account_index} | Starting Mictonode faucet...")
+
+        # solving vercel
+        headers = {
+            "cache-control": "max-age=0",
+            "sec-ch-ua": '"Google Chrome";v="131", "Not-A.Brand";v="8", "Chromium";v="131"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "sec-fetch-site": "same-origin",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-user": "?1",
+            "sec-fetch-dest": "document",
+            "referer": "https://0g-faucet.mictonode.com/",
+            "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
+            "priority": "u=0, i",
+        }
+
+        response = await session.get(
+            "https://0g-faucet.mictonode.com/", headers=headers
+        )
+
+        response_headers = response.headers
+
+        if "x-vercel-challenge-token" in response_headers:
+            challenge_token = response_headers["x-vercel-challenge-token"]
+        else:
+            raise Exception("Vercel challenge token not found")
+
+        solvium = Solvium(
+            api_key=config.CAPTCHA.SOLVIUM_API_KEY,
+            session=session,
+            proxy=proxy,
+        )
+
+        # Use the new solve_vercel_challenge method to get the cookie value
+        vcrcs_cookie = await solvium.solve_vercel_challenge(
+            challenge_token=challenge_token,
+            site_url="https://0g-faucet.mictonode.com",
+            session=session,
+        )
+
+        if vcrcs_cookie is None:
+            raise Exception("Vercel challenge not solved")
+
+        logger.success(f"{account_index} | Vercel challenge solved successfully")
+
+        # Now solve the actual site captcha
+        logger.info(f"[{account_index}] | Solving hCaptcha challenge with Solvium...")
+        captcha_token = await solvium.solve_captcha(
+            sitekey="6c5e817a-6d02-4698-bfec-3844064c7da4",
+            pageurl="https://0g-faucet.mictonode.com/",
+        )
+
+        if captcha_token is None:
+            raise Exception("Captcha not solved")
+
+        logger.success(f"{account_index} | Captcha solved for faucet")
+
+        headers = {
+            "cookie": f"_vcrcs={vcrcs_cookie}",
+            "accept": "*/*",
+            "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
+            "content-type": "text/plain;charset=UTF-8",
+            "origin": "https://0g-faucet.mictonode.com",
+            "priority": "u=1, i",
+            "referer": "https://0g-faucet.mictonode.com/",
+            "sec-ch-ua": '"Google Chrome";v="131", "Not-A.Brand";v="8", "Chromium";v="131"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        }
+
+        json_data = {
+            "address": wallet.address,
+            "hcaptchaToken": captcha_token,
+        }
+
+        # session = await create_client(proxy, config.OTHERS.SKIP_SSL_VERIFICATION)
+
+        response = await session.post(
+            "https://0g-faucet.mictonode.com/api/faucet",
+            headers=headers,
+            json=json_data,
+        )
+
+        if (
+            ">Vercel Security Checkpoint<" in response.text
+            or "We're verifying your browser" in response.text
+            or "Enable JavaScript to continue" in response.text
+        ):
+            raise Exception("Vercel bypass failed")
+
+        if '"success":true' in response.text:
+            logger.success(f"{account_index} | Faucet Mictonode requested successfully")
+            return True
+
+        if "System is busy processing another transaction" in response.text:
+            raise Exception("Faucet is busy. Please retry later.")
+
+        if "hours before requesting again" in response.text:
+            logger.success(
+                f"{account_index} | Faucet already requested today. {response.text}"
+            )
+            return True
+
+        if "Internal Server Error" in response.text:
+            raise Exception(f"Faucet is just a piece of shit. Trying again...")
+
+        if "Service is busy. Please retry later." in response.text:
+            random_pause = random.randint(
+                config.SETTINGS.PAUSE_BETWEEN_ATTEMPTS[0],
+                config.SETTINGS.PAUSE_BETWEEN_ATTEMPTS[1],
+            )
+            raise Exception(f"Faucet is busy. Please retry later.")
+
+        if "Please wait 24 hours before requesting again" in response.text:
+            logger.success(
+                f"{account_index} | Faucet already requested today. Wait 24 hours before requesting again."
+            )
+            return True
+
+        if "Invalid Captcha" in response.text:
+            raise Exception("Invalid Captcha")
+
+        if response.status_code == 200:
+            logger.success(f"{account_index} | Faucet Mictonode requested successfully")
+            return True
+
+        raise Exception(f"Unknown error: {response.status_code} | {response.text}")
+
+    except Exception as e:
+        random_pause = random.randint(
+            config.SETTINGS.PAUSE_BETWEEN_ATTEMPTS[0],
+            config.SETTINGS.PAUSE_BETWEEN_ATTEMPTS[1],
+        )
+        if "hours before requesting again" in str(e):
+            logger.success(
+                f"{account_index} | Faucet already requested today. Wait some time before requesting again."
+            )
+            return True
+        logger.error(
+            f"{account_index} | Faucet Mictonode error: {e}. Sleeping {random_pause} seconds..."
         )
         await asyncio.sleep(random_pause)
         raise

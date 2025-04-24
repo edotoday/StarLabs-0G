@@ -3,9 +3,11 @@ from noble_tls import Session, Client
 
 
 async def create_client(
-    proxy: str, skip_ssl_verification: bool = True
+    proxy: str, skip_ssl_verification: bool = True, chrome_version: int = 131
 ) -> primp.AsyncClient:
-    session = primp.AsyncClient(impersonate="chrome_131", verify=skip_ssl_verification)
+    session = primp.AsyncClient(
+        impersonate=f"chrome_{chrome_version}", verify=skip_ssl_verification
+    )
 
     if proxy:
         session.proxy = proxy
@@ -40,10 +42,12 @@ async def create_twitter_client(proxy: str, auth_token: str) -> Session:
     session.random_tls_extension_order = True
 
     if proxy:
-        session.proxies.update({
-            "http": "http://" + proxy,
-            "https": "http://" + proxy,
-        })
+        session.proxies.update(
+            {
+                "http": "http://" + proxy,
+                "https": "http://" + proxy,
+            }
+        )
 
     session.timeout_seconds = 30
 
@@ -80,4 +84,3 @@ def get_headers(session: Session, **kwargs) -> dict:
         "x-twitter-client-language": "en",
     }
     return dict(sorted({k.lower(): v for k, v in headers.items()}.items()))
-
