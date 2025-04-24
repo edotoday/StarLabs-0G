@@ -1,6 +1,7 @@
 TASKS = ["FAUCET"]
 
 
+EASYNODE_DEPLOY = ["easynode_deploy"]
 FAUCET = ["faucet"]
 PUZZLEMANIA = ["puzzlemania"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
@@ -41,9 +42,9 @@ TASKS = [
 ]
 CREATE_YOUR_OWN_TASK = [
     "faucet",
-    ("faucet_tokens", "swaps"),
-    ["storagescan_deploy", "conft_mint"],
-    "swaps",
+    ("storagescan_deploy", "mintair_deploy"),
+    ["puzzlemania", "easynode_deploy"],
+    "storagescan_deploy",
 ]
 --------------------------------
 
@@ -57,4 +58,6 @@ faucet - faucet A0GI tokens (needs captcha and twitter)
 storagescan_deploy - deploy storagescan file
 mintair_deploy - deploy contract at https://contracts.mintair.xyz/
 puzzlemania - complete tasks on https://puzzlemania.0g.ai/
+easynode_deploy - deploy easynode contract at https://playground.easy-node.xyz/
+
 """

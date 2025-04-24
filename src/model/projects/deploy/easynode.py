@@ -35,8 +35,6 @@ async def easynode_deploy(
         if balance.ether == 0:
             raise Exception("Wallet balance is 0")
 
-        logger.info(f"{account_index} | Starting deployment of easynode contract...")
-
         # Получаем текущие газовые параметры и увеличиваем их в 1.5 раза
         gas_price = await web3.web3.eth.gas_price
         gas_price = int(gas_price * 1.5)
@@ -59,17 +57,15 @@ async def easynode_deploy(
 
                 tx_params = {
                     "from": wallet.address,
-                    "value": web3.web3.to_wei(0.1, "ether"),
+                    "value": web3.web3.to_wei(0.05, "ether"),
                     "data": PAYLOAD,
                     "nonce": await web3.web3.eth.get_transaction_count(wallet.address),
                     "chainId": CHAIN_ID,
                     "maxFeePerGas": max_fee_per_gas,
                     "maxPriorityFeePerGas": max_priority_fee,
-                    "type": 2,
+                    "type": "0x2",
                 }
-                logger.info(
-                    f"{account_index} | Using EIP-1559 gas parameters: maxFeePerGas={max_fee_per_gas}, maxPriorityFeePerGas={max_priority_fee}"
-                )
+
             except Exception as e:
                 logger.warning(
                     f"{account_index} | Error setting EIP-1559 parameters: {e}, falling back to legacy"
@@ -105,10 +101,6 @@ async def easynode_deploy(
             tx_params.pop("maxFeePerGas", None)
             tx_params.pop("maxPriorityFeePerGas", None)
             tx_params.pop("type", None)
-
-        logger.info(
-            f"{account_index} | Using gas parameters: {tx_params.get('gasPrice') or (tx_params.get('maxFeePerGas'), tx_params.get('maxPriorityFeePerGas'))}"
-        )
 
         # Выполняем транзакцию
         tx_hash = await web3.execute_transaction(
