@@ -30,7 +30,7 @@ class FlowConfig:
 
 
 @dataclass
-class Hub0gSwapsConfig:
+class ZeroExchangeSwapsConfig:
     BALANCE_PERCENT_TO_SWAP: Tuple[int, int]
     NUMBER_OF_SWAPS: Tuple[int, int]
 
@@ -76,7 +76,7 @@ class WalletsConfig:
 class Config:
     SETTINGS: SettingsConfig
     FLOW: FlowConfig
-    HUB_0G_SWAPS: Hub0gSwapsConfig
+    ZERO_EXCHANGE_SWAPS: ZeroExchangeSwapsConfig
     CAPTCHA: CaptchaConfig
     RPCS: RpcsConfig
     OTHERS: OthersConfig
@@ -137,11 +137,11 @@ class Config:
                 TASKS=tasks_list,
                 SKIP_FAILED_TASKS=data["FLOW"]["SKIP_FAILED_TASKS"],
             ),
-            HUB_0G_SWAPS=Hub0gSwapsConfig(
+            ZERO_EXCHANGE_SWAPS=ZeroExchangeSwapsConfig(
                 BALANCE_PERCENT_TO_SWAP=tuple(
-                    data["HUB_0G_SWAPS"]["BALANCE_PERCENT_TO_SWAP"]
+                    data["ZERO_EXCHANGE_SWAPS"]["BALANCE_PERCENT_TO_SWAP"]
                 ),
-                NUMBER_OF_SWAPS=tuple(data["HUB_0G_SWAPS"]["NUMBER_OF_SWAPS"]),
+                NUMBER_OF_SWAPS=tuple(data["ZERO_EXCHANGE_SWAPS"]["NUMBER_OF_SWAPS"]),
             ),
             CAPTCHA=CaptchaConfig(
                 SOLVIUM_API_KEY=data["CAPTCHA"]["SOLVIUM_API_KEY"],

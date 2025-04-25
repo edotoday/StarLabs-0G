@@ -3,10 +3,11 @@ TASKS = ["FAUCET"]
 
 EASYNODE_DEPLOY = ["easynode_deploy"]
 FAUCET = ["faucet"]
+FAUCET_TOKENS = ["faucet_tokens"]
 PUZZLEMANIA = ["puzzlemania"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
 MINTAIR_DEPLOY = ["mintair_deploy"]
-
+ZERO_EXCHANGE_SWAPS = ["zero_exchange_swaps"]
 """
 EN:
 You can create your own task with the modules you need 
@@ -59,5 +60,6 @@ storagescan_deploy - deploy storagescan file
 mintair_deploy - deploy contract at https://contracts.mintair.xyz/
 puzzlemania - complete tasks on https://puzzlemania.0g.ai/
 easynode_deploy - deploy easynode contract at https://playground.easy-node.xyz/
-
+faucet_tokens - faucet ETH/BTC/USDT tokens https://test.zer0.exchange/faucet
+zero_exchange_swaps - swaps tokens on https://test.zer0.exchange/swap
 """

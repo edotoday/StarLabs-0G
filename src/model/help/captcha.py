@@ -530,43 +530,4 @@ class Solvium:
         if not solution:
             return None
 
-        # Step 2: Submit the solution to get the cookie
-        try:
-            headers = {
-                "x-vercel-challenge-token": challenge_token,
-                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-                "x-vercel-challenge-version": "2",
-                "x-vercel-challenge-solution": solution,
-                "accept": "*/*",
-                "origin": "https://0g-faucet.mictonode.com",
-                "sec-fetch-site": "same-origin",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-dest": "empty",
-                "referer": "https://0g-faucet.mictonode.com/.well-known/vercel/security/static/challenge.v2.min.js",
-                "accept-language": "ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7,zh-TW;q=0.6,zh;q=0.5,uk;q=0.4",
-                "priority": "u=1, i",
-            }
-
-            url = f"{site_url}/.well-known/vercel/security/request-challenge"
-            response = await session.post(
-                url,
-                headers=headers,
-                timeout=30,
-            )
-
-            # Step 3: Extract the cookie
-            if "set-cookie" in response.headers:
-                cookie_header = response.headers["set-cookie"]
-                if "_vcrcs=" in cookie_header:
-                    # Extract cookie value
-                    vcrcs = cookie_header.split("_vcrcs=")[1].split(";")[0]
-                    return vcrcs
-
-            logger.error(
-                f"Failed to get cookie from Vercel challenge response: {response.headers}"
-            )
-            return None
-
-        except Exception as e:
-            logger.error(f"Error submitting Vercel challenge solution: {e}")
-            return None
+        return solution

@@ -176,7 +176,7 @@ def create_required_directories():
                     </div>
                     <div class="sidebar-item" data-section="swaps">
                         <i class="fas fa-sync"></i>
-                        <span>Hub 0G Swaps</span>
+                        <span>Zero Exchange Swaps</span>
                     </div>
                     <div class="sidebar-item" data-section="captcha">
                         <i class="fas fa-robot"></i>
@@ -1200,7 +1200,7 @@ function renderConfig(config) {
     const sections = {
         'settings': { key: 'SETTINGS', title: 'Settings', icon: 'cog' },
         'flow': { key: 'FLOW', title: 'Flow', icon: 'exchange-alt' },
-        'swaps': { key: 'HUB_0G_SWAPS', title: 'Hub 0G Swaps', icon: 'sync' },
+        'swaps': { key: 'ZERO_EXCHANGE_SWAPS', title: 'Zero Exchange Swaps', icon: 'sync' },
         'captcha': { key: 'CAPTCHA', title: 'Captcha', icon: 'robot' },
         'rpcs': { key: 'RPCS', title: 'RPCs', icon: 'network-wired' },
         'puzzlemania': { key: 'PUZZLEMANIA', title: 'Puzzlemania', icon: 'puzzle-piece' },
@@ -1229,7 +1229,8 @@ function renderConfig(config) {
                 createCard(cardsContainer, 'Basic Settings', 'sliders-h', [
                     { key: 'THREADS', value: config[key]['THREADS'] },
                     { key: 'ATTEMPTS', value: config[key]['ATTEMPTS'] },
-                    { key: 'SHUFFLE_WALLETS', value: config[key]['SHUFFLE_WALLETS'] }
+                    { key: 'SHUFFLE_WALLETS', value: config[key]['SHUFFLE_WALLETS'] },
+                    { key: 'WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS', value: config[key]['WAIT_FOR_TRANSACTION_CONFIRMATION_IN_SECONDS'] }
                 ], key);
                 
                 // Карточка для диапазонов аккаунтов
@@ -1267,6 +1268,17 @@ function renderConfig(config) {
                     { key: 'INVITES_PER_REFERRAL_CODE', value: config[key]['INVITES_PER_REFERRAL_CODE'] },
                     { key: 'COLLECT_REFERRAL_CODE', value: config[key]['COLLECT_REFERRAL_CODE'], isCheckbox: true }
                 ], key);
+            } else if (key === 'ZERO_EXCHANGE_SWAPS') {
+                // Специальная обработка для Zero Exchange Swaps
+                createCard(cardsContainer, 'Zero Exchange Swaps Settings', 'sync', [
+                    { key: 'BALANCE_PERCENT_TO_SWAP', value: config[key]['BALANCE_PERCENT_TO_SWAP'] },
+                    { key: 'NUMBER_OF_SWAPS', value: config[key]['NUMBER_OF_SWAPS'] }
+                ], key);
+            } else if (key === 'FLOW') {
+                // Специальная обработка для Flow
+                createCard(cardsContainer, 'Flow Settings', 'exchange-alt', [
+                    { key: 'SKIP_FAILED_TASKS', value: config[key]['SKIP_FAILED_TASKS'], isCheckbox: true }
+                ], key);
             } else if (key === 'RPCS') {
                 // Специальная обработка для RPCs
                 createCard(cardsContainer, 'RPC Settings', 'network-wired', 
@@ -1278,6 +1290,12 @@ function renderConfig(config) {
                     })), 
                     key
                 );
+            } else if (key === 'OTHERS') {
+                // Специальная обработка для Other Settings
+                createCard(cardsContainer, 'Other Settings', 'ellipsis-h', [
+                    { key: 'SKIP_SSL_VERIFICATION', value: config[key]['SKIP_SSL_VERIFICATION'], isCheckbox: true },
+                    { key: 'USE_PROXY_FOR_RPC', value: config[key]['USE_PROXY_FOR_RPC'], isCheckbox: true }
+                ], key);
             } else {
                 // Остальные категории
                 createCard(cardsContainer, `${title} Settings`, icon, 
