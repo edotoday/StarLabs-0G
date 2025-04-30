@@ -87,3 +87,30 @@ PUZZLEMANIA:
     USE_REFERRAL_CODE: false
     INVITES_PER_REFERRAL_CODE: [1, 3]
     COLLECT_REFERRAL_CODE: true
+
+CRUSTY_SWAP:
+    NETWORKS_TO_REFUEL_FROM: ["Arbitrum", "Optimism", "Base"]
+    AMOUNT_TO_REFUEL: [0.0003, 0.0004]
+    MINIMUM_BALANCE_TO_REFUEL: 99999
+    WAIT_FOR_FUNDS_TO_ARRIVE: true
+    MAX_WAIT_TIME: 999999
+    BRIDGE_ALL: false
+    BRIDGE_ALL_MAX_AMOUNT: 0.01
+
+# --------------------------- #
+# EXCHANGES SECTION
+# --------------------------- #
+EXCHANGES:
+    name: "OKX"  # Supported: "OKX", "BITGET"
+    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    secretKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    passphrase: 'xxxxxxx'  
+    withdrawals:
+        - currency: "ETH" # ONLY ETH
+          networks: ["Arbitrum", "Optimism"] # ["Arbitrum", "Base", "Optimism"]
+          min_amount: 0.0004
+          max_amount: 0.0006
+          max_balance: 0.005
+          wait_for_funds: true
+          max_wait_time: 99999  # in seconds
+          retries: 3

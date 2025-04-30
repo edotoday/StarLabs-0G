@@ -1,5 +1,10 @@
-TASKS = ["FAUCET"]
+TASKS = ["CRUSTY_SWAP"]
 
+CRUSTY_SWAP = [
+    # "cex_withdrawal",
+    "crusty_refuel",
+    # "crusty_refuel_from_one_to_all",
+]
 
 EASYNODE_DEPLOY = ["easynode_deploy"]
 FAUCET = ["faucet"]
@@ -8,6 +13,7 @@ PUZZLEMANIA = ["puzzlemania"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
 MINTAIR_DEPLOY = ["mintair_deploy"]
 ZERO_EXCHANGE_SWAPS = ["zero_exchange_swaps"]
+
 """
 EN:
 You can create your own task with the modules you need 
@@ -54,7 +60,9 @@ BELOW ARE THE READY-MADE TASKS THAT YOU CAN USE:
 СНИЗУ ПРИВЕДЕНЫ ГОТОВЫЕ ПРИМЕРЫ ЗАДАЧ, КОТОРЫЕ ВЫ МОЖЕТЕ ИСПОЛЬЗОВАТЬ:
 以下是您可以使用的现成任务：
 
-
+crusty_refuel - refuel MEGAETH at https://www.crustyswap.com/
+crusty_refuel_from_one_to_all - refuel MEGAETH from one to all wallets at https://www.crustyswap.com/
+cex_withdrawal - withdraw ETH from cex exchange (okx, bitget)
 faucet - faucet A0GI tokens (needs captcha and twitter)
 storagescan_deploy - deploy storagescan file
 mintair_deploy - deploy contract at https://contracts.mintair.xyz/

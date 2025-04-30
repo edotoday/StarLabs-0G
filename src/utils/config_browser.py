@@ -58,6 +58,15 @@ def load_config():
 def save_config(config):
     """Сохранение конфигурации в YAML файл"""
     try:
+        # Check for and fix withdrawals[0] issue
+        if 'EXCHANGES' in config and 'withdrawals[0]' in config['EXCHANGES']:
+            # Create withdrawals list if it doesn't exist
+            if 'withdrawals' not in config['EXCHANGES']:
+                config['EXCHANGES']['withdrawals'] = []
+            
+            # Add the content of withdrawals[0] to the list
+            config['EXCHANGES']['withdrawals'].append(config['EXCHANGES'].pop('withdrawals[0]'))
+            
         with open(CONFIG_PATH, "w") as file:
             yaml.dump(config, file, default_flow_style=False, sort_keys=False)
     except Exception as e:
@@ -189,6 +198,14 @@ def create_required_directories():
                     <div class="sidebar-item" data-section="puzzlemania">
                         <i class="fas fa-puzzle-piece"></i>
                         <span>Puzzlemania</span>
+                    </div>
+                    <div class="sidebar-item" data-section="crustyswap">
+                        <i class="fas fa-gas-pump"></i>
+                        <span>Crusty Swap</span>
+                    </div>
+                    <div class="sidebar-item" data-section="exchanges">
+                        <i class="fas fa-university"></i>
+                        <span>Exchanges</span>
                     </div>
                     <div class="sidebar-item" data-section="others">
                         <i class="fas fa-ellipsis-h"></i>
@@ -1151,8 +1168,12 @@ function collectFormData() {
         
         if (element.type === 'checkbox') {
             current[lastKey] = element.checked;
+        } else if (element.classList.contains('network-checkbox-container')) {
+            const selectedNetworks = Array.from(element.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+            current[lastKey] = selectedNetworks;
         } else if (element.classList.contains('tags-input')) {
-            // Обработка полей с тегами (например, для RPCS)
+            // Обработка полей с тегами (например, для RPCS, NETWORKS_TO_REFUEL_FROM, EXCHANGES.withdrawals.networks)
             const tags = Array.from(element.querySelectorAll('.tag-text'))
                 .map(tag => tag.textContent.trim());
             current[lastKey] = tags;
@@ -1161,13 +1182,17 @@ function collectFormData() {
             if (!current[rangeKey]) {
                 current[rangeKey] = [0, 0];
             }
-            current[rangeKey][0] = parseInt(element.value);
+            // Parse as float or int based on data-type attribute
+            const parseFunc = element.dataset.type === 'float' ? parseFloat : parseInt;
+            current[rangeKey][0] = parseFunc(element.value);
         } else if (element.classList.contains('range-max')) {
             const rangeKey = lastKey.replace('_MAX', '');
             if (!current[rangeKey]) {
                 current[rangeKey] = [0, 0];
             }
-            current[rangeKey][1] = parseInt(element.value);
+            // Parse as float or int based on data-type attribute
+            const parseFunc = element.dataset.type === 'float' ? parseFloat : parseInt;
+            current[rangeKey][1] = parseFunc(element.value);
         } else if (element.classList.contains('list-input')) {
             // Для списков (разделенных запятыми)
             current[lastKey] = element.value.split(',')
@@ -1182,6 +1207,8 @@ function collectFormData() {
             // Для обычных полей
             if (element.dataset.type === 'number') {
                 current[lastKey] = parseInt(element.value);
+            } else if (element.dataset.type === 'float') {
+                current[lastKey] = parseFloat(element.value);
             } else {
                 current[lastKey] = element.value;
             }
@@ -1204,6 +1231,8 @@ function renderConfig(config) {
         'captcha': { key: 'CAPTCHA', title: 'Captcha', icon: 'robot' },
         'rpcs': { key: 'RPCS', title: 'RPCs', icon: 'network-wired' },
         'puzzlemania': { key: 'PUZZLEMANIA', title: 'Puzzlemania', icon: 'puzzle-piece' },
+        'crustyswap': { key: 'CRUSTY_SWAP', title: 'Crusty Swap', icon: 'gas-pump' },
+        'exchanges': { key: 'EXCHANGES', title: 'Exchanges', icon: 'university' },
         'others': { key: 'OTHERS', title: 'Others', icon: 'ellipsis-h' }
     };
     
@@ -1296,6 +1325,61 @@ function renderConfig(config) {
                     { key: 'SKIP_SSL_VERIFICATION', value: config[key]['SKIP_SSL_VERIFICATION'], isCheckbox: true },
                     { key: 'USE_PROXY_FOR_RPC', value: config[key]['USE_PROXY_FOR_RPC'], isCheckbox: true }
                 ], key);
+            } else if (key === 'CRUSTY_SWAP') {
+                createCard(cardsContainer, 'Crusty Swap Settings', 'gas-pump', [
+                    { key: 'NETWORKS_TO_REFUEL_FROM', value: config[key]['NETWORKS_TO_REFUEL_FROM'], isNetworkSelection: true },
+                    { key: 'AMOUNT_TO_REFUEL', value: config[key]['AMOUNT_TO_REFUEL'], isFloat: true },
+                    { key: 'MINIMUM_BALANCE_TO_REFUEL', value: config[key]['MINIMUM_BALANCE_TO_REFUEL'], isFloat: true },
+                    { key: 'WAIT_FOR_FUNDS_TO_ARRIVE', value: config[key]['WAIT_FOR_FUNDS_TO_ARRIVE'], isCheckbox: true },
+                    { key: 'MAX_WAIT_TIME', value: config[key]['MAX_WAIT_TIME'] },
+                    { key: 'BRIDGE_ALL', value: config[key]['BRIDGE_ALL'], isCheckbox: true },
+                    { key: 'BRIDGE_ALL_MAX_AMOUNT', value: config[key]['BRIDGE_ALL_MAX_AMOUNT'], isFloat: true }
+                ], key);
+            } else if (key === 'EXCHANGES') {
+                // General Exchange Settings
+                createCard(cardsContainer, 'Exchange Details', 'info-circle', [
+                    { key: 'name', value: config[key]['name'], isSelect: true, options: ['OKX', 'BITGET'] },
+                    { key: 'apiKey', value: config[key]['apiKey'] },
+                    { key: 'secretKey', value: config[key]['secretKey'] },
+                    { key: 'passphrase', value: config[key]['passphrase'] }
+                ], key);
+
+                // Withdrawals - Create a card for each withdrawal config
+                if (config[key]['withdrawals'] && Array.isArray(config[key]['withdrawals'])) {
+                     const withdrawalsCard = document.createElement('div');
+                     withdrawalsCard.className = 'config-card';
+                     const withdrawalsTitle = document.createElement('div');
+                     withdrawalsTitle.className = 'card-title';
+                     withdrawalsTitle.innerHTML = '<i class="fas fa-money-bill-wave"></i> Withdrawals';
+                     withdrawalsCard.appendChild(withdrawalsTitle);
+
+                     config[key]['withdrawals'].forEach((withdrawal, index) => {
+                        const withdrawalGroup = document.createElement('div');
+                        withdrawalGroup.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                        withdrawalGroup.style.borderRadius = '8px';
+                        withdrawalGroup.style.padding = '15px';
+                        withdrawalGroup.style.marginBottom = '15px';
+
+                        const groupTitle = document.createElement('h4');
+                        groupTitle.textContent = `Withdrawal ${index + 1} (${withdrawal.currency || 'N/A'})`;
+                        groupTitle.style.marginBottom = '10px';
+                        groupTitle.style.color = 'var(--neon-cyan)';
+                        withdrawalGroup.appendChild(groupTitle);
+
+                        // Create fields for each withdrawal property
+                        createTextField(withdrawalGroup, 'currency', withdrawal.currency, `${key}.withdrawals[${index}].currency`);
+                        createNetworkSelectionField(withdrawalGroup, 'networks', withdrawal.networks, `${key}.withdrawals[${index}].networks`);
+                        createTextField(withdrawalGroup, 'min_amount', withdrawal.min_amount, `${key}.withdrawals[${index}].min_amount`, true);
+                        createTextField(withdrawalGroup, 'max_amount', withdrawal.max_amount, `${key}.withdrawals[${index}].max_amount`, true);
+                        createTextField(withdrawalGroup, 'max_balance', withdrawal.max_balance, `${key}.withdrawals[${index}].max_balance`, true);
+                        createCheckboxField(withdrawalGroup, 'wait_for_funds', withdrawal.wait_for_funds, `${key}.withdrawals[${index}].wait_for_funds`);
+                        createTextField(withdrawalGroup, 'max_wait_time', withdrawal.max_wait_time, `${key}.withdrawals[${index}].max_wait_time`);
+                        createTextField(withdrawalGroup, 'retries', withdrawal.retries, `${key}.withdrawals[${index}].retries`);
+
+                        withdrawalsCard.appendChild(withdrawalGroup);
+                     });
+                     cardsContainer.appendChild(withdrawalsCard);
+                }
             } else {
                 // Остальные категории
                 createCard(cardsContainer, `${title} Settings`, icon, 
@@ -1327,15 +1411,19 @@ function createCard(container, title, iconClass, fields, category) {
     
     cardDiv.appendChild(titleDiv);
     
-    fields.forEach(({ key, value, isList, isSpaceList }) => {
-        if (typeof value === 'boolean') {
+    fields.forEach(({ key, value, isList, isSpaceList, isFloat, isCheckbox, isNetworkSelection, isSelect, options }) => {
+        if (isCheckbox || (typeof value === 'boolean' && isCheckbox === undefined)) {
             createCheckboxField(cardDiv, key, value, `${category}.${key}`);
-        } else if (Array.isArray(value) && value.length === 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
-            createRangeField(cardDiv, key, value, `${category}.${key}`);
-        } else if (Array.isArray(value) && isList) {
+        } else if (Array.isArray(value) && value.length === 2 && (typeof value[0] === 'number' || typeof value[0] === 'string') && (typeof value[1] === 'number' || typeof value[1] === 'string') && !isList && !isSpaceList && !isNetworkSelection) {
+            createRangeField(cardDiv, key, value, `${category}.${key}`, isFloat);
+        } else if (isNetworkSelection) {
+            createNetworkSelectionField(cardDiv, key, value, `${category}.${key}`);
+        } else if (isList) {
             createTagsField(cardDiv, key, value, `${category}.${key}`, false);
-        } else if (Array.isArray(value) && isSpaceList) {
+        } else if (isSpaceList) {
             createTagsField(cardDiv, key, value, `${category}.${key}`, true);
+        } else if (isSelect) {
+            createSelectField(cardDiv, key, value, options, `${category}.${key}`);
         } else if (Array.isArray(value)) {
             createListField(cardDiv, key, value, `${category}.${key}`);
         } else {
@@ -1347,7 +1435,7 @@ function createCard(container, title, iconClass, fields, category) {
 }
 
 // Создание текстового поля
-function createTextField(container, key, value, path) {
+function createTextField(container, key, value, path, isFloat = false) {
     const fieldDiv = document.createElement('div');
     fieldDiv.className = 'config-field';
     
@@ -1363,17 +1451,24 @@ function createTextField(container, key, value, path) {
     input.dataset.configPath = path;
     
     // Добавляем подсказку для API ключей
-    if (key.includes('API_KEY')) {
+    if (key.toLowerCase().includes('key')) {
         const tooltip = document.createElement('span');
         tooltip.className = 'tooltip';
         tooltip.innerHTML = '?<span class="tooltip-text">Enter your API key here</span>';
         label.appendChild(tooltip);
     }
     
-    if (typeof value === 'number') {
+    if (typeof value === 'number' && !isFloat) {
         input.dataset.type = 'number';
         input.type = 'number';
         input.className += ' small-input';
+    } else if (typeof value === 'number' && isFloat) {
+        input.dataset.type = 'float';
+        input.type = 'number';
+        input.step = 'any';
+        input.className += ' small-input';
+    } else if (key.toLowerCase().includes('key') || key.toLowerCase().includes('token') || key.toLowerCase().includes('passphrase')) {
+        input.type = 'password';
     }
     
     fieldDiv.appendChild(input);
@@ -1381,7 +1476,7 @@ function createTextField(container, key, value, path) {
 }
 
 // Создание поля диапазона
-function createRangeField(container, key, value, path) {
+function createRangeField(container, key, value, path, isFloat = false) {
     const fieldDiv = document.createElement('div');
     fieldDiv.className = 'config-field';
     
@@ -1398,7 +1493,8 @@ function createRangeField(container, key, value, path) {
     minInput.className = 'field-input range-min small-input';
     minInput.value = value[0];
     minInput.dataset.configPath = `${path}_MIN`;
-    minInput.dataset.type = 'number';
+    minInput.dataset.type = isFloat ? 'float' : 'number';
+    if (isFloat) minInput.step = 'any';
     
     const separator = document.createElement('span');
     separator.className = 'range-separator';
@@ -1409,7 +1505,8 @@ function createRangeField(container, key, value, path) {
     maxInput.className = 'field-input range-max small-input';
     maxInput.value = value[1];
     maxInput.dataset.configPath = `${path}_MAX`;
-    maxInput.dataset.type = 'number';
+    maxInput.dataset.type = isFloat ? 'float' : 'number';
+    if (isFloat) maxInput.step = 'any';
     
     rangeDiv.appendChild(minInput);
     rangeDiv.appendChild(separator);
@@ -1546,6 +1643,85 @@ function showNotification(message, type) {
     setTimeout(() => {
         notification.className = 'notification';
     }, 3000);
+}
+
+// --- New Helper Function for Network Selection ---
+function createNetworkSelectionField(container, key, currentValues, path) {
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = 'config-field';
+
+    const label = document.createElement('label');
+    label.className = 'field-label';
+    label.textContent = formatFieldName(key);
+    fieldDiv.appendChild(label);
+
+    const checkboxContainer = document.createElement('div');
+    checkboxContainer.dataset.configPath = path;
+    checkboxContainer.className = 'network-checkbox-container';
+    checkboxContainer.style.display = 'flex';
+    checkboxContainer.style.gap = '15px';
+    checkboxContainer.style.marginTop = '10px';
+
+    const allowedNetworks = ["Arbitrum", "Optimism", "Base"];
+
+    // Ensure currentValues is an array
+    const selectedValues = Array.isArray(currentValues) ? currentValues : [];
+
+    allowedNetworks.forEach(network => {
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.gap = '5px';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = network;
+        checkbox.id = `${path}-${network}`.replace(/\\.|\\\[|\\\]/g, '-');
+        checkbox.checked = selectedValues.includes(network);
+        checkbox.className = 'checkbox-input';
+        checkbox.style.width = '20px';
+        checkbox.style.height = '20px';
+
+        const checkboxLabel = document.createElement('label');
+        checkboxLabel.textContent = network;
+        checkboxLabel.htmlFor = checkbox.id;
+        checkboxLabel.className = 'checkbox-label';
+
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(checkboxLabel);
+        checkboxContainer.appendChild(wrapper);
+    });
+
+    fieldDiv.appendChild(checkboxContainer);
+    container.appendChild(fieldDiv);
+}
+
+// --- New Helper Function for Select Field ---
+function createSelectField(container, key, currentValue, options, path) {
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = 'config-field';
+
+    const label = document.createElement('label');
+    label.className = 'field-label';
+    label.textContent = formatFieldName(key);
+    fieldDiv.appendChild(label);
+
+    const select = document.createElement('select');
+    select.className = 'field-input'; // Use existing styling
+    select.dataset.configPath = path;
+
+    options.forEach(optionValue => {
+        const option = document.createElement('option');
+        option.value = optionValue;
+        option.textContent = optionValue;
+        if (optionValue === currentValue) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+
+    fieldDiv.appendChild(select);
+    container.appendChild(fieldDiv);
 }
 """
 
