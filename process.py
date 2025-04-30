@@ -202,13 +202,6 @@ async def account_flow(
     twitter_token: str,
 ):
     try:
-        pause = random.randint(
-            config.SETTINGS.RANDOM_INITIALIZATION_PAUSE[0],
-            config.SETTINGS.RANDOM_INITIALIZATION_PAUSE[1],
-        )
-        logger.info(f"[{account_index}] Sleeping for {pause} seconds before start...")
-        await asyncio.sleep(pause)
-
         instance = src.model.Start(
             account_index, proxy, private_key, config, twitter_token
         )
@@ -220,13 +213,6 @@ async def account_flow(
         result = await wrapper(instance.flow, config)
         if not result:
             report = True
-
-        pause = random.randint(
-            config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[0],
-            config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[1],
-        )
-        logger.info(f"Sleeping for {pause} seconds before next account...")
-        await asyncio.sleep(pause)
 
         # Add progress update
         await progress_tracker.increment(1)
