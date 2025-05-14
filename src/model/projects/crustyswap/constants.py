@@ -10,7 +10,7 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 CRUSTY_SWAP_RPCS = {
     "Arbitrum": "https://arb1.lava.build",
-    "Optimism": "https://optimism.lava.build",
+    "Optimism": "https://optimism.drpc.org",
     "Base": "https://base.lava.build",
     "Ethereum": "https://eth1.lava.build"
 }
