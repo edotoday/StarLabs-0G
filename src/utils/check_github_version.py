@@ -104,11 +104,14 @@ def format_version_changes(versions: List[VersionInfo]) -> None:
         table.add_column("Update Date", style="magenta", justify="center")
         table.add_column("Changes", style="green")
 
-        for version in versions:
+        for i, version in enumerate(versions):
             changes_str = "\n".join(f"• {change}" for change in version.changes)
             table.add_row(
                 f"✨ {version.version}", f"📅 {version.update_date}", changes_str
             )
+            # Add separator after each row except the last one
+            if i < len(versions) - 1:
+                table.add_row("─" * 12, "─" * 21, "─" * 40, style="dim")
 
         print("📋 Available Updates:")
         console.print(table)
