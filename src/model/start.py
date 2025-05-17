@@ -4,6 +4,7 @@ import primp
 import random
 import asyncio
 
+from src.model.projects.mints.omnihub import OmniHub
 from src.model.projects.swaps.zero_exchange.instance import zero_exchange_swaps
 from src.model.projects.others.puzzlemania.instance import Puzzlemania
 from src.model.projects.deploy import memebridge_deploy, mintair_deploy, easynode_deploy
@@ -359,6 +360,16 @@ class Start:
                     self.config,
                     self.wallet,
                 )
+
+            if task == "omnihub":
+                instance = OmniHub(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
+                return await instance.mint()
             
             logger.error(f"{self.account_index} | Task {task} not found")
             return False

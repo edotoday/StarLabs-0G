@@ -59,14 +59,16 @@ def save_config(config):
     """Сохранение конфигурации в YAML файл"""
     try:
         # Check for and fix withdrawals[0] issue
-        if 'EXCHANGES' in config and 'withdrawals[0]' in config['EXCHANGES']:
+        if "EXCHANGES" in config and "withdrawals[0]" in config["EXCHANGES"]:
             # Create withdrawals list if it doesn't exist
-            if 'withdrawals' not in config['EXCHANGES']:
-                config['EXCHANGES']['withdrawals'] = []
-            
+            if "withdrawals" not in config["EXCHANGES"]:
+                config["EXCHANGES"]["withdrawals"] = []
+
             # Add the content of withdrawals[0] to the list
-            config['EXCHANGES']['withdrawals'].append(config['EXCHANGES'].pop('withdrawals[0]'))
-            
+            config["EXCHANGES"]["withdrawals"].append(
+                config["EXCHANGES"].pop("withdrawals[0]")
+            )
+
         with open(CONFIG_PATH, "w") as file:
             yaml.dump(config, file, default_flow_style=False, sort_keys=False)
     except Exception as e:
@@ -1233,7 +1235,8 @@ function renderConfig(config) {
         'puzzlemania': { key: 'PUZZLEMANIA', title: 'Puzzlemania', icon: 'puzzle-piece' },
         'crustyswap': { key: 'CRUSTY_SWAP', title: 'Crusty Swap', icon: 'gas-pump' },
         'exchanges': { key: 'EXCHANGES', title: 'Exchanges', icon: 'university' },
-        'others': { key: 'OTHERS', title: 'Others', icon: 'ellipsis-h' }
+        'others': { key: 'OTHERS', title: 'Others', icon: 'ellipsis-h' },
+        'mints': { key: 'MINTS', title: 'OmniHub', icon: 'cube' }
     };
     
     // Создаем все секции
@@ -1380,6 +1383,11 @@ function renderConfig(config) {
                      });
                      cardsContainer.appendChild(withdrawalsCard);
                 }
+            } else if (key === 'MINTS') {
+                // Special handling for MINTS section
+                createCard(cardsContainer, 'OmniHub Settings', 'cube', [
+                    { key: 'MAX_PRICE_TO_MINT', value: config[key]['OMNIHUB']['MAX_PRICE_TO_MINT'], isFloat: true }
+                ], `${key}.OMNIHUB`);
             } else {
                 // Остальные категории
                 createCard(cardsContainer, `${title} Settings`, icon, 

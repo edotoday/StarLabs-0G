@@ -13,7 +13,8 @@ PUZZLEMANIA = ["puzzlemania"]
 STORAGESCAN_DEPLOY = ["storagescan_deploy"]
 MINTAIR_DEPLOY = ["mintair_deploy"]
 ZERO_EXCHANGE_SWAPS = ["zero_exchange_swaps"]
-
+CONFT_MINT = ["conft_mint"]
+OMNIHUB = ["omnihub"]
 """
 EN:
 You can create your own task with the modules you need 
@@ -70,4 +71,6 @@ puzzlemania - complete tasks on https://puzzlemania.0g.ai/
 easynode_deploy - deploy easynode contract at https://playground.easy-node.xyz/
 faucet_tokens - faucet ETH/BTC/USDT tokens https://test.zer0.exchange/faucet
 zero_exchange_swaps - swaps tokens on https://test.zer0.exchange/swap
+conft_mint - mint Conft.app NFT and domain
+omnihub - mint OmniHub NFT https://omnihub.xyz/collections?chain=og-labs-testnet
 """

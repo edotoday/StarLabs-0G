@@ -23,7 +23,7 @@ SETTINGS:
     SHUFFLE_WALLETS: true
 
     # pause between attempts
-    PAUSE_BETWEEN_ATTEMPTS: [3, 10]
+    PAUSE_BETWEEN_ATTEMPTS: [3,10]
 
     # pause between swaps
     PAUSE_BETWEEN_SWAPS: [3, 10]
@@ -36,7 +36,7 @@ SETTINGS:
     
     # random pause before start of every account
     # to make sure that all accounts will be started at different times
-    RANDOM_INITIALIZATION_PAUSE: [3, 30]
+    RANDOM_INITIALIZATION_PAUSE: [3, 10]
     
     # if true, bot will send logs to telegram
     SEND_TELEGRAM_LOGS: false
@@ -70,7 +70,7 @@ CAPTCHA:
     # API KEY for solvium
     # https://t.me/solvium_crypto_bot
     # https://t.me/solvium_crypto_bot
-    SOLVIUM_API_KEY: "xxxxxxxxxxxxxxxxxxxxxxx"
+    SOLVIUM_API_KEY: "1111111111111111111111"
 
 
     USE_NOCAPTCHA: false
@@ -83,6 +83,13 @@ OTHERS:
     SKIP_SSL_VERIFICATION: true
     USE_PROXY_FOR_RPC: true
   
+
+MINTS:
+    OMNIHUB:
+        # max price of NFT to mint
+        MAX_PRICE_TO_MINT: 0.00011
+
+
 PUZZLEMANIA:
     USE_REFERRAL_CODE: false
     INVITES_PER_REFERRAL_CODE: [1, 3]

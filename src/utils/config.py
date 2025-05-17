@@ -47,6 +47,14 @@ class RpcsConfig:
 
 
 @dataclass
+class OmniHubConfig:
+    MAX_PRICE_TO_MINT: float
+
+@dataclass
+class MintsConfig:
+    OMNIHUB: OmniHubConfig
+    
+@dataclass
 class PuzzlemaniaConfig:
     USE_REFERRAL_CODE: bool
     INVITES_PER_REFERRAL_CODE: Tuple[int, int]
@@ -114,6 +122,7 @@ class Config:
     PUZZLEMANIA: PuzzlemaniaConfig
     CRUSTY_SWAP: CrustySwapConfig
     EXCHANGES: ExchangesConfig
+    MINTS: MintsConfig
     WALLETS: WalletsConfig = field(default_factory=WalletsConfig)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     spare_twitter_tokens: List[str] = field(default_factory=list)
@@ -226,6 +235,11 @@ class Config:
                 MAX_WAIT_TIME=data["CRUSTY_SWAP"]["MAX_WAIT_TIME"],
                 BRIDGE_ALL=data["CRUSTY_SWAP"]["BRIDGE_ALL"],
                 BRIDGE_ALL_MAX_AMOUNT=data["CRUSTY_SWAP"]["BRIDGE_ALL_MAX_AMOUNT"],
+            ),
+            MINTS=MintsConfig(
+                OMNIHUB=OmniHubConfig(
+                    MAX_PRICE_TO_MINT=data["MINTS"]["OMNIHUB"]["MAX_PRICE_TO_MINT"]
+                )
             ),
         )
 

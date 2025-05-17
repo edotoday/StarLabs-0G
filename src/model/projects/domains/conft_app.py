@@ -14,7 +14,7 @@ from src.utils.constants import EXPLORER_URL_0G
 
 
 # NFT Contract Constants
-CONFT_NFT_ADDRESS = "0x9059cA87Ddc891b91e731C57D21809F1A4adC8D9"
+CONFT_NFT_ADDRESS = "0xFC79f0EaC5bEcf21fDcf037bAdb977b2b43DE497"
 CONFT_CHAIN_ID = 16601
 CONFT_NFT_ABI = [
     {
@@ -156,7 +156,7 @@ async def mint_nft(
 
         # Set transaction type based on gas params
         if "maxFeePerGas" in gas_params:
-            tx_params["type"] = 2
+            tx_params["type"] = "0x2"
 
         mint_tx = await nft_contract.functions.mint().build_transaction(tx_params)
 
@@ -186,7 +186,7 @@ async def mint_nft(
 
 
 # Domain Contract Constants
-DOMAIN_CONTRACT_ADDRESS = "0xCF7f37B4916AC5c530C863f8c8bB26Ec1e8d2Ccb"
+DOMAIN_CONTRACT_ADDRESS = "0x0C33E3F070724f6A90191b397281D785425F7247"
 DOMAIN_CONTRACT_ABI = [
     {
         "name": "balanceOf",
@@ -265,7 +265,7 @@ async def mint_domain(
         tx_params = {
             "from": wallet.address,
             "to": web3.web3.to_checksum_address(DOMAIN_CONTRACT_ADDRESS),
-            "value": 0,  # Free mint
+            "value": "0xd529ae9e860000",  # 0.06 0g
             "nonce": await web3.web3.eth.get_transaction_count(wallet.address),
             "chainId": CONFT_CHAIN_ID,
             "data": data,
@@ -274,7 +274,7 @@ async def mint_domain(
 
         # Set transaction type based on gas params
         if "maxFeePerGas" in gas_params:
-            tx_params["type"] = 2
+            tx_params["type"] = "0x2"
 
         # Try to estimate gas
         try:
