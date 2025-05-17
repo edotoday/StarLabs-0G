@@ -14,7 +14,7 @@ from src.utils.decorators import retry_async
 from src.utils.config import Config
 from src.utils.constants import EXPLORER_URL_0G
 
-STORAGE_SCAN_CONTRACT = "0x56A565685C9992BF5ACafb940ff68922980DBBC5"
+STORAGE_SCAN_CONTRACT = "0x5f1D96895e442FC0168FA2F9fb1EBeF93Cb5035e"
 CHAIN_ID = 16601
 
 
