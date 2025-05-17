@@ -4,11 +4,9 @@ from loguru import logger
 
 
 import src.utils
-from src.utils.output import show_dev_info, show_logo
 from src.utils.proxy_parser import Proxy
 import src.model
 from src.utils.statistics import print_wallets_stats
-from src.utils.check_github_version import check_version
 from src.utils.logs import ProgressTracker, create_progress_tracker
 from src.utils.config_browser import run
 
@@ -25,15 +23,6 @@ async def start():
                 progress_tracker,
                 twitter_token,
             )
-
-    try:
-        await check_version("0xStarLabs", "StarLabs-0G")
-    except Exception as e:
-        import traceback
-
-        traceback.print_exc()
-        logger.error(f"Failed to check version: {e}")
-        logger.info("Continue with current version\n")
 
     print("\nAvailable options:\n")
     print("[1] ⭐️ Start farming")

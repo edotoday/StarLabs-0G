@@ -103,6 +103,9 @@ async def _connect_twitter(
     twitter_token: str,
 ) -> tuple[str, str]:
     try:
+        
+        twitter_client = await create_twitter_client(proxy, twitter_token)
+
         headers = {
             "sec-ch-ua-platform": '"Windows"',
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
@@ -118,13 +121,13 @@ async def _connect_twitter(
             "priority": "u=1, i",
         }
 
-        response = await session.post(
-            "https://faucet.0g.ai/api/request-token", headers=headers
+        data = '{"domain":"0g"}'
+
+        response = await twitter_client.post(
+            "https://faucet.0g.ai/api/request-token", headers=headers, data=data
         )
 
         oauth_token = response.json()["url"].split("oauth_token=")[1].strip()
-
-        twitter_client = await create_twitter_client(proxy, twitter_token)
 
         headers = {
             "sec-ch-ua": '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
