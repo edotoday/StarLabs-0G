@@ -115,7 +115,8 @@ async def mint_nerzo_0gog(
 
         # Устанавливаем тип транзакции в зависимости от параметров газа
         if "maxFeePerGas" in gas_params:
-            tx_params["type"] = 2
+            tx_params["type"] = "0x2"  # Use hex string format
+
 
         # Оцениваем газ динамически
         try:

@@ -4,6 +4,8 @@ import primp
 import random
 import asyncio
 
+from src.model.projects.mints.mintaura import mintaura_pandriel
+from src.model.projects.mints.morkie import morkie_og_mint
 from src.model.projects.mints.omnihub import OmniHub
 from src.model.projects.swaps.zero_exchange.instance import zero_exchange_swaps
 from src.model.projects.others.puzzlemania.instance import Puzzlemania
@@ -370,6 +372,25 @@ class Start:
                     self.wallet,
                 )
                 return await instance.mint()
+            
+            if task == "morkie_og_mint":
+                return await morkie_og_mint(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
+            
+            if task == "mintaura_pandriel_mint":
+                return await mintaura_pandriel(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
+            
             
             logger.error(f"{self.account_index} | Task {task} not found")
             return False
