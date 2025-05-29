@@ -9,7 +9,7 @@ from process import start
 from src.utils.output import show_logo, show_dev_info
 from src.utils.check_github_version import check_version
 
-VERSION = "1.2.2"  # Current software version
+VERSION = "1.2.3"  # Current software version
 
 if platform.system() == "Windows":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
