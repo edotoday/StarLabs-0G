@@ -23,21 +23,21 @@ SETTINGS:
     SHUFFLE_WALLETS: true
 
     # pause between attempts
-    PAUSE_BETWEEN_ATTEMPTS: [3,10]
+    PAUSE_BETWEEN_ATTEMPTS: [3, 8]
 
     # pause between swaps
-    PAUSE_BETWEEN_SWAPS: [3, 10]
+    PAUSE_BETWEEN_SWAPS: [10, 15]
     
     # pause in seconds between accounts
-    RANDOM_PAUSE_BETWEEN_ACCOUNTS: [3, 10]
+    RANDOM_PAUSE_BETWEEN_ACCOUNTS: [10, 15]
     
     # pause in seconds between actions
-    RANDOM_PAUSE_BETWEEN_ACTIONS: [3, 10]
+    RANDOM_PAUSE_BETWEEN_ACTIONS: [10, 15]
     
     # random pause before start of every account
     # to make sure that all accounts will be started at different times
-    RANDOM_INITIALIZATION_PAUSE: [3, 10]
-    
+    RANDOM_INITIALIZATION_PAUSE: [10, 15]
+
     # if true, bot will send logs to telegram
     SEND_TELEGRAM_LOGS: false
     # telegram bot token
@@ -70,7 +70,7 @@ CAPTCHA:
     # API KEY for solvium
     # https://t.me/solvium_crypto_bot
     # https://t.me/solvium_crypto_bot
-    SOLVIUM_API_KEY: "1111111111111111111111"
+    SOLVIUM_API_KEY: "xxxxxxxxxx"
 
 
     USE_NOCAPTCHA: false
@@ -94,6 +94,13 @@ PUZZLEMANIA:
     USE_REFERRAL_CODE: false
     INVITES_PER_REFERRAL_CODE: [1, 3]
     COLLECT_REFERRAL_CODE: true
+
+
+STAKING:
+    ASTROSTAKE:
+        BALANCE_PERCENT_TO_STAKE: [5, 10]
+        
+
 
 CRUSTY_SWAP:
     NETWORKS_TO_REFUEL_FROM: ["Arbitrum", "Optimism", "Base"]

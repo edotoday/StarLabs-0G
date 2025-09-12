@@ -1,0 +1,1 @@
+from .instance import tradegpt_staking

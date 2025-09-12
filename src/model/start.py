@@ -4,6 +4,10 @@ import primp
 import random
 import asyncio
 
+from src.model.projects.mints.onchaingm import onchaingm_gm
+from src.model.projects.liquidity.astrostake.instance import astrostake_staking
+from src.model.projects.liquidity.tradegpt.instance import tradegpt_staking
+from src.model.projects.others.jaine.instance import jaine_faucet
 from src.model.projects.mints.mintaura import mintaura_pandriel
 from src.model.projects.mints.morkie import morkie_og_mint
 from src.model.projects.mints.omnihub import OmniHub
@@ -391,7 +395,39 @@ class Start:
                     self.wallet,
                 )
             
-            
+            if task == "jaine_faucet":
+                return await jaine_faucet(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
+
+            if task == "astrostake_staking":
+                return await astrostake_staking(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
+            if task == "tradegpt_staking":
+                return await tradegpt_staking(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
+            if task == "onchaingm":
+                return await onchaingm_gm(
+                    self.account_index,
+                    self.session,
+                    self.zerog_web3,
+                    self.config,
+                    self.wallet,
+                )
             logger.error(f"{self.account_index} | Task {task} not found")
             return False
 

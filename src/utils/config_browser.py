@@ -213,6 +213,10 @@ def create_required_directories():
                         <i class="fas fa-ellipsis-h"></i>
                         <span>Others</span>
                     </div>
+                    <div class="sidebar-item" data-section="staking">
+                        <i class="fas fa-coins"></i>
+                        <span>Staking</span>
+                    </div>
                 </div>
             </div>
             
@@ -1236,7 +1240,8 @@ function renderConfig(config) {
         'crustyswap': { key: 'CRUSTY_SWAP', title: 'Crusty Swap', icon: 'gas-pump' },
         'exchanges': { key: 'EXCHANGES', title: 'Exchanges', icon: 'university' },
         'others': { key: 'OTHERS', title: 'Others', icon: 'ellipsis-h' },
-        'mints': { key: 'MINTS', title: 'OmniHub', icon: 'cube' }
+        'mints': { key: 'MINTS', title: 'Mints', icon: 'cube' },
+        'staking': { key: 'STAKING', title: 'Staking', icon: 'coins' }
     };
     
     // Создаем все секции
@@ -1388,6 +1393,11 @@ function renderConfig(config) {
                 createCard(cardsContainer, 'OmniHub Settings', 'cube', [
                     { key: 'MAX_PRICE_TO_MINT', value: config[key]['OMNIHUB']['MAX_PRICE_TO_MINT'], isFloat: true }
                 ], `${key}.OMNIHUB`);
+            } else if (key === 'STAKING') {
+                // Special handling for STAKING section
+                createCard(cardsContainer, 'AstroStake Settings', 'coins', [
+                    { key: 'BALANCE_PERCENT_TO_STAKE', value: config[key]['ASTROSTAKE']['BALANCE_PERCENT_TO_STAKE'] }
+                ], `${key}.ASTROSTAKE`);
             } else {
                 // Остальные категории
                 createCard(cardsContainer, `${title} Settings`, icon, 

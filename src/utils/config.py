@@ -24,6 +24,15 @@ class SettingsConfig:
 
 
 @dataclass
+class AstroStakeConfig:
+    BALANCE_PERCENT_TO_STAKE: Tuple[int, int]
+
+
+@dataclass
+class StakingConfig:
+    ASTROSTAKE: AstroStakeConfig
+
+@dataclass
 class FlowConfig:
     TASKS: List
     SKIP_FAILED_TASKS: bool
@@ -123,6 +132,7 @@ class Config:
     CRUSTY_SWAP: CrustySwapConfig
     EXCHANGES: ExchangesConfig
     MINTS: MintsConfig
+    STAKING: StakingConfig
     WALLETS: WalletsConfig = field(default_factory=WalletsConfig)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     spare_twitter_tokens: List[str] = field(default_factory=list)
@@ -239,6 +249,13 @@ class Config:
             MINTS=MintsConfig(
                 OMNIHUB=OmniHubConfig(
                     MAX_PRICE_TO_MINT=data["MINTS"]["OMNIHUB"]["MAX_PRICE_TO_MINT"]
+                )
+            ),
+            STAKING=StakingConfig(
+                ASTROSTAKE=AstroStakeConfig(
+                    BALANCE_PERCENT_TO_STAKE=tuple(
+                        data["STAKING"]["ASTROSTAKE"]["BALANCE_PERCENT_TO_STAKE"]
+                    )
                 )
             ),
         )
